@@ -30,7 +30,8 @@ namespace Inspector
         public System.Windows.Point Point;
         private MouseHook mouseHook;
         private DispatcherTimer timer;
-
+        private IntPtr desktopPtr;
+        private Graphics graphics;
 
         public SelectorPage()
         {
@@ -53,15 +54,55 @@ namespace Inspector
             mouseHook.Install();
 
 
-
             timer.Interval = TimeSpan.FromMilliseconds(100);    //시간간격 설정
-            timer.Tick += new EventHandler(AddPnt);          //이벤트 추가
+            timer.Tick += new EventHandler(DrawBox);
             timer.Start();
 
         }
 
+
+        private void DrawBox(object sender, EventArgs e)
+        {
+            desktopPtr = Graphics.FromHwnd(IntPtr.Zero).GetHdc();
+            graphics = Graphics.FromHdc(desktopPtr);
+
+            AutomationElement ae = AutomationElement.FromPoint(Point);
+            if(ae.Current.ControlType == ControlType.Button)
+            {
+                System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Aqua);
+                graphics.DrawRectangle(pen, (float)ae.Current.BoundingRectangle.X, (float)ae.Current.BoundingRectangle.Y,
+                    (float)ae.Current.BoundingRectangle.Width, (float)ae.Current.BoundingRectangle.Height);
+                SolidBrush semiTransBrush = new SolidBrush(System.Drawing.Color.FromArgb(128, 0, 0, 255));
+                graphics.FillRectangle(semiTransBrush, (float)ae.Current.BoundingRectangle.X, (float)ae.Current.BoundingRectangle.Y,
+                    (float)ae.Current.BoundingRectangle.Width, (float)ae.Current.BoundingRectangle.Height);
+                graphics.Dispose();
+            }
+
+            
+            //Graphics g = Graphics.FromHdc(desktopPtr);
+            //System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Blue);
+            //System.Drawing.Brush brush = new System.Drawing.SolidBrush(System.Drawing.Color.Yellow);
+            //System.Drawing.Rectangle Rect = new System.Drawing.Rectangle(
+            //    (int)((AutomationElement)ae).Current.BoundingRectangle.X,
+            //    (int)((AutomationElement)ae).Current.BoundingRectangle.Y,
+            //    (int)((AutomationElement)ae).Current.BoundingRectangle.Width,
+            //    (int)((AutomationElement)ae).Current.BoundingRectangle.Height);
+            //g.FillRectangle(brush, Rect);
+            //g.DrawRectangle(pen, Rect);
+            //g.Dispose();
+
+        }
+        [DllImport("User32.dll")]
+        public static extern IntPtr GetDC(IntPtr hwnd);
+        [DllImport("User32.dll")]
+        public static extern void ReleaseDC(IntPtr hwnd, IntPtr dc);
+        [DllImport("gdi32.dll")]
+        static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+
         private void MouseHook_LeftButtonDown(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
+
             timer.Stop();
             mouseHook.Uninstall();
 
@@ -92,27 +133,6 @@ namespace Inspector
             }
         }
 
-        private void AddPnt(object sender, EventArgs e)
-        {
-            listView2.Items.Add(Point.X + "," + Point.Y);
-        }
-
-        //private void DrawRect(object sender, EventArgs e)
-        //{
-        //        IntPtr desktopPtr = GetDC(IntPtr.Zero);
-        //        Graphics g = Graphics.FromHdc(desktopPtr);
-        //        System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Blue);
-        //        System.Drawing.Brush brush = new System.Drawing.SolidBrush(System.Drawing.Color.Yellow);
-        //        System.Drawing.Rectangle Rect = new System.Drawing.Rectangle(
-        //            (int)((AutomationElement)ae).Current.BoundingRectangle.X,
-        //            (int)((AutomationElement)ae).Current.BoundingRectangle.Y,
-        //            (int)((AutomationElement)ae).Current.BoundingRectangle.Width,
-        //            (int)((AutomationElement)ae).Current.BoundingRectangle.Height);
-        //        g.FillRectangle(brush, Rect);
-        //        g.DrawRectangle(pen, Rect);
-        //        g.Dispose();
-        //        ReleaseDC(IntPtr.Zero, desktopPtr);
-        //}
 
         private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
@@ -120,13 +140,8 @@ namespace Inspector
             Point.Y = mouseStruct.pt.y;
         }
 
-        
 
 
-        [DllImport("User32.dll")]
-        public static extern IntPtr GetDC(IntPtr hwnd);
-        [DllImport("User32.dll")]
-        public static extern void ReleaseDC(IntPtr hwnd, IntPtr dc);
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
         {
             timer.Stop();
