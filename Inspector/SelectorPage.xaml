@@ -17,10 +17,11 @@
             <ListView x:Name="listView2" ></ListView>
         </Grid>
         <Grid Grid.Column="1">
-            <Label x:Name="label1"></Label>
+            <ListView x:Name="ElementInfoListView" ></ListView>
         </Grid>
         <Grid Grid.Column="2">
-            <Button x:Name="buttonStart" Height="50" Click="ButtonStart_Click"/>
+            <Button Content="Start Selector" x:Name="buttonStart" Height="50" Click="ButtonStart_Click" Margin="0,10,-0.2,360"/>
+            <Button Content="Stop Selector" x:Name="buttonStop" Height="50" Click="ButtonStop_Click" Margin="0,76,-0.2,294"/>
         </Grid>
     </Grid>
 </Window>

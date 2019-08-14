@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
@@ -25,6 +27,10 @@ namespace Inspector
 
     public partial class SelectorPage : Window
     {
+        public System.Windows.Point Point;
+        private MouseHook mouseHook;
+        private DispatcherTimer timer;
+
 
         public SelectorPage()
         {
@@ -33,38 +39,98 @@ namespace Inspector
 
         private void Window_Initialized(object sender, EventArgs e)
         {
-            
+            mouseHook = new MouseHook();
+            timer = new DispatcherTimer();    //객체생성
+
         }
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
-            AutomationFocusChangedEventHandler afceh =
-                new AutomationFocusChangedEventHandler(FocusChanged);
-            Automation.AddAutomationFocusChangedEventHandler(afceh);
+            //this.WindowState = WindowState.Minimized;
+
+            mouseHook.MouseMove += MouseHook_MouseMove;
+            mouseHook.LeftButtonDown += MouseHook_LeftButtonDown;
+            mouseHook.Install();
+
+
+
+            timer.Interval = TimeSpan.FromMilliseconds(100);    //시간간격 설정
+            timer.Tick += new EventHandler(AddPnt);          //이벤트 추가
+            timer.Start();
+
+        }
+
+        private void MouseHook_LeftButtonDown(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        {
+            timer.Stop();
+            mouseHook.Uninstall();
+
+            try
+            {
+                AutomationElement ae = AutomationElement.FromPoint(Point);
+                TreeWalker walker = TreeWalker.RawViewWalker;
+                ElementInfoListView.Items.Clear();
+                ElementInfoListView.Items.Add(ae.Current.Name);
+                FindParents(walker, ae);
+            }
+            catch (System.Runtime.InteropServices.COMException)
+            {
+                MessageBox.Show("System.Runtime.InteropServices.COMException");
+            }
             
 
+            
         }
 
-        public void FocusChanged(object sender, AutomationFocusChangedEventArgs e)
+        private void FindParents(TreeWalker walker, AutomationElement ae)
         {
-            Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate {
-                AutomationElement ae = AutomationElement.FocusedElement;
-                label1.Content = ae.Current.ControlType;
-            }));
-
+            AutomationElement parent = walker.GetParent(ae);
+            if(parent != null)
+            {
+                ElementInfoListView.Items.Add(parent.Current.Name);
+                FindParents(walker, parent);
+            }
         }
 
+        private void AddPnt(object sender, EventArgs e)
+        {
+            listView2.Items.Add(Point.X + "," + Point.Y);
+        }
 
-        [DllImport("user32.dll")]
-        static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, int dwExtraInfo);
+        //private void DrawRect(object sender, EventArgs e)
+        //{
+        //        IntPtr desktopPtr = GetDC(IntPtr.Zero);
+        //        Graphics g = Graphics.FromHdc(desktopPtr);
+        //        System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Blue);
+        //        System.Drawing.Brush brush = new System.Drawing.SolidBrush(System.Drawing.Color.Yellow);
+        //        System.Drawing.Rectangle Rect = new System.Drawing.Rectangle(
+        //            (int)((AutomationElement)ae).Current.BoundingRectangle.X,
+        //            (int)((AutomationElement)ae).Current.BoundingRectangle.Y,
+        //            (int)((AutomationElement)ae).Current.BoundingRectangle.Width,
+        //            (int)((AutomationElement)ae).Current.BoundingRectangle.Height);
+        //        g.FillRectangle(brush, Rect);
+        //        g.DrawRectangle(pen, Rect);
+        //        g.Dispose();
+        //        ReleaseDC(IntPtr.Zero, desktopPtr);
+        //}
 
-        const uint MOUSEMOVE = 0x0001;      // 마우스 이동
-        const uint ABSOLUTEMOVE = 0x8000;   // 전역 위치
-        const uint LBUTTONDOWN = 0x0002;    // 왼쪽 마우스 버튼 눌림
-        const uint LBUTTONUP = 0x0004;      // 왼쪽 마우스 버튼 떼어짐
-        const uint RBUTTONDOWN = 0x0008;    // 오른쪽 마우스 버튼 눌림
-        const uint RBUTTONUP = 0x00010;      // 오른쪽 마우스 버튼 떼어짐
+        private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        {
+            Point.X = mouseStruct.pt.x;
+            Point.Y = mouseStruct.pt.y;
+        }
 
         
+
+
+        [DllImport("User32.dll")]
+        public static extern IntPtr GetDC(IntPtr hwnd);
+        [DllImport("User32.dll")]
+        public static extern void ReleaseDC(IntPtr hwnd, IntPtr dc);
+        private void ButtonStop_Click(object sender, RoutedEventArgs e)
+        {
+            timer.Stop();
+            mouseHook.Uninstall();
+        }
     }
 }

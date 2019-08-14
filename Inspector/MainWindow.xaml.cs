@@ -38,7 +38,7 @@ namespace Inspector
 
         private void GetProcButton_Click(object sender, RoutedEventArgs e)
         {
-
+            treeView1.Items.Clear();
 
             Loading loading = new Loading();
             loading.Show();
@@ -126,20 +126,7 @@ namespace Inspector
                 SelectedItemController();
 
                 //
-                IntPtr desktopPtr = GetDC(IntPtr.Zero);
-                Graphics g = Graphics.FromHdc(desktopPtr);
-
-                System.Drawing.Pen b = new System.Drawing.Pen(System.Drawing.Color.White);
-                System.Drawing.Rectangle Rect = new System.Drawing.Rectangle(
-                    (int)ae.Current.BoundingRectangle.X,
-                    (int)ae.Current.BoundingRectangle.Y,
-                    (int)ae.Current.BoundingRectangle.Width,
-                    (int)ae.Current.BoundingRectangle.Height);
-
-                g.DrawRectangle(b, Rect);
-                g.Dispose();
-
-                ReleaseDC(IntPtr.Zero, desktopPtr);
+                
 
             }
             catch (Exception)
@@ -159,24 +146,23 @@ namespace Inspector
             }
         }
 
-        [DllImport("User32.dll")]
-        public static extern IntPtr GetDC(IntPtr hwnd);
-        [DllImport("User32.dll")]
-        public static extern void ReleaseDC(IntPtr hwnd, IntPtr dc);
+        
 
 
         private void CallSelector_Click(object sender, RoutedEventArgs e)
         {
-            SelectorPage selectorPage = new SelectorPage();
-            this.WindowState = WindowState.Minimized;
-            selectorPage.ShowDialog();
-            
-            selectorPage.Close();
-            this.WindowState = WindowState.Normal;
 
+            SelectorPage selectorPage = new SelectorPage();
+            selectorPage.Owner = this;
+            selectorPage.WindowState = WindowState.Normal;
+
+            selectorPage.ShowDialog();
+
+            Selector.SelectorController(selectorPage);
+            
+           
         }
 
-        
         private void SelectedItemController()
         {
             AutomationPattern[] patterns = SelectedItem.GetSupportedPatterns();
@@ -200,6 +186,9 @@ namespace Inspector
         }
         private void ListView2_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
+
+
             selectedListItem = e.AddedItems[0] as ListViewItem;
         }
         private void CallHandler_Click(object sender, RoutedEventArgs e)
