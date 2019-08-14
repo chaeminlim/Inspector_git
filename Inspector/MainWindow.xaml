@@ -1,0 +1,40 @@
+﻿<Window x:Class="Inspector.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inspector"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="666" Width="1046">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <TreeView x:Name="treeView1"  SelectedItemChanged="TreeView1_SelectedItemChanged"/>
+        </Grid>
+        <Grid Grid.Column="1">
+            <ListView   x:Name="listView1" HorizontalAlignment="Left"  VerticalAlignment="Top">
+            </ListView>
+        </Grid>
+        <Grid Grid.Column="2">
+            <StackPanel>
+                <Button x:Name="GetProcButton" Content="Get Processes" Margin="10,10,10,10" HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="GetProcButton_Click" Width="336" />
+                <Button x:Name="CallSelector" Content="Selector" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="336" Click="CallSelector_Click" />
+                <Label x:Name="label1" Content="Label" Margin="0,0,0.4,0"/>
+                <ListView x:Name="listView2" Height="478" Margin="0,0,0.4,0" SelectionChanged="ListView2_SelectionChanged">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <Button x:Name="CallHandler" Content="CallHandler" HorizontalAlignment="Left" Margin="10,10,0,10" VerticalAlignment="Top" Width="336" Click="CallHandler_Click" Height="23" />
+
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

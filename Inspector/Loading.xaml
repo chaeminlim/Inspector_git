@@ -1,0 +1,13 @@
+﻿<Window x:Class="Inspector.Loading"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inspector"
+        mc:Ignorable="d"
+        Title="Loading" Height="156.433" Width="345.937">
+    <Grid Margin="0,0,509.6,237">
+        <Label Content="Label" HorizontalAlignment="Left" Height="57" Margin="66,34,-262,-91" VerticalAlignment="Top" Width="196"/>
+
+    </Grid>
+</Window>
