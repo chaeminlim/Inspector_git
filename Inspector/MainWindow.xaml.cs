@@ -38,146 +38,37 @@ namespace Inspector
         //change into xml버튼을 누른경우
         private void GetXmlButton_Click(object sender, RoutedEventArgs e)
         {
-            try  //트리뷰의 하위노드를 클릭한경우
+            try
             {
+
                 AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
                 SelectedItem = ae;
-                string str = "";
 
-                Stack<AutomationElement> automationElements = new Stack<AutomationElement>();  //계층구조를 저장할 스택선언
-                TreeWalker walker = TreeWalker.RawViewWalker;  // treewalker 선언
-                automationElements.Push(ae);  //해당노드를 스택에 먼저 push
-
-                AutomationElement parent = walker.GetParent(ae);  //treewalker를 통해 바로위의 부모를 찾는다.
-                while (walker.GetParent(parent) != null)  //최상위 부모를 찾을때까지 반복문 실행
-                {
-                    automationElements.Push(parent);  //각 계층구조를 스택에 저장
-                    parent = walker.GetParent(parent);
-                }
-
-                XmlController xmlController = new XmlController();
-                xmlController.MakeXmlFile(automationElements);
+                Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
+                String resultString = XmlController.MakeXmlFile(automationElmements);
+                showxml.Text = resultString;  //저장된 str을 textbox위치에 출력
 
             }
-            catch (Exception)
+            catch (System.NullReferenceException)
             {
-
+                MessageBox.Show("NullReferenceException");
             }
 
-
-
-                
-            //    Process ps = Process.GetProcessById(ae.Current.ProcessId);  //프로세스id로 현재 프로세스를 찾아 관련정보를 ps에저장
-            //    if (ps.ProcessName.Equals("chrome") || ps.ProcessName.Equals("explorer"))
-            //    {  //인터넷창이 최상위부모인경우
-            //        str = "<html app:" + ps.ProcessName + " />\n";  //태그를 html로 시작
-            //        int i = 1;
-            //        while (automationElements.Count != 0)  //스택이 빌때까지 반복문실행
-            //        {
-            //            for (int j = 1; j <= i; j++) { str += "  "; }
-            //            SelectedItem = (AutomationElement)automationElements.Peek();  //스택에서 한개씩 꺼내서 해당요소이름을 출력
-            //            str += "<webctrl " + SelectedItem.Current.Name + "/>\n";
-            //            automationElements.Pop(); i++;
-            //        }
-
-            //    }
-            //    else  //인터넷창이 최상위부모가 아닌경우 wnd로 태그시작
-            //    {
-            //        str = "<wnd app:" + ps.ProcessName + " />\n";
-            //        int i = 1;
-            //        while (automationElements.Count() != 0)
-            //        {
-            //            for (int j = 1; j <= i; j++)
-            //            {
-            //                str += "  ";
-            //            }
-            //            SelectedItem = (AutomationElement)(automationElements.Peek());
-            //            str += "<ctrl " + SelectedItem.Current.Name + "/>\n";
-            //            automationElements.Pop(); i++;
-            //        }
-            //    }
-            //    showxml.Text = str;  //저장된 str을 textbox위치에 출력
-            //}
-            //catch (Exception)  //최상위 프로세스를 클릭한경우 최상위 프로세스이름만 출력
-            //{
-            //    try
-            //    {
-            //        Process ps = (Process)((TreeViewItem)treeView1.SelectedItem).Tag;
-            //        string str = "";
-            //        if (ps.ProcessName.Equals("chrome") || ps.ProcessName.Equals("explorer"))
-            //        {
-            //            str = "<html app:" + ps.ProcessName + " /> ";
-
-            //        }
-            //        else
-            //        {
-            //            str = "<wnd app:" + ps.ProcessName + " /> ";
-            //        }
-            //        showxml.Text = str;
-            //    }
-            //    catch (Exception)
-            //    {
-            //        MessageBox.Show("error2");
-            //    }
-            //}
 
         }
         //getprocess버튼을 클릭했을 경우
         private void GetProcButton_Click(object sender, RoutedEventArgs e)
         {
-            treeView1.Items.Clear();  //트리뷰를 우선 초기화한다
-
             Loading loading = new Loading();  //트리뷰가 실행되기까지 loading이란 문구가 뜨도록 보여준다.
             loading.Show();
-
-            Process[] processes = Process.GetProcesses();  //현재 모든 실행중인 모든프로세스를 배열형태로 저장
-            foreach (Process proc in processes)  //모든 프로세스를 foreach로 돌면서 메인창이 뜨는 프로세스 각각을 treeviewitem객체에 넣는다
-            {
-                if (proc.MainWindowHandle != IntPtr.Zero)
-                {
-                    //header의 경우는 treeview에 프로세스 이름이 출력되도록하는것.
-                    //tag는 그 프로세스이름을 클릭 시 해당 정보가 출력되도록하는것.(listview1에)
-                    TreeViewItem tvi = new TreeViewItem() { Header = proc.ProcessName, Tag = proc };
-                    tvi.ExpandSubtree();  //현재 프로세스 하위 트리가 한단계 펼쳐지도록 해주는 부분.
-                    TreeViewWrapper wrapper = new TreeViewWrapper(tvi);  //treevieitem add를 쉽게하기위해 treewrapper안에 treeviewitem객체를 넣는다.
-                    treeView1.Items.Add(wrapper.Node);
-                    UIAutomationElementFinder(wrapper);  //현재 프로세스안에 있는 uiautomationelement부분을 찾아준다.
-                }
-            }
+            MainWindowSetter.GetProcessInit(treeView1);
+            
 
             loading.Close();  //'로딩중'이란 창을 닫아준다.
         }
 
-        //해당 treeviewitem에서 uiautomationelement에 대한 정보를 미리 찾아주는 함수
-        private void UIAutomationElementFinder(TreeViewWrapper wrapper)  //treeviewitem이 담겨있는 treeviewwrapper를 넘겨준다
-        {
-            Process proc = (Process)wrapper.Node.Tag;  //넘겨준 treeviewwrapper객체의 상세설명인 tag를 변수 proc에 저장해준다
 
-            AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);  //proc을 다룰수있는 핸들에 관한 정보를 automationelement 객체에 넣어준다
-            AutomationElementWrapper aew = new AutomationElementWrapper(ae);  //마찬가지로 automationelement객체의 add를 쉽게해주기위해 automationelementwrapper에 넣어준다
-
-            wrapper.Add(aew.Node);
-            wrapper.Node.ExpandSubtree();  //매개변수로 넘겨진 프로세스의 하위트리를 한단계 펼쳐준다
-
-
-            TreeWalker walker = TreeWalker.RawViewWalker; // treewalker객체 rawviewwalker로 만들어주어 모든 트리를 순회가능하도록 생성하고, 만들어진 
-                                                          //트리를 순회하면서 완성하도록한다.(미리 정보가져오기위함)
-            TraverseElement(walker, aew);
-        }
-
-        //treewalker객체로 트리완성하는 함수. 매개변수로 treewalker, automationelement가 들어있는 automationelementwrapper에 넣어준다
-        private void TraverseElement(TreeWalker walker, AutomationElementWrapper automationElementWrapper)
-        {
-            AutomationElement child = walker.GetFirstChild(automationElementWrapper.AE); //treewalker를 통해 해당 automationelement의 첫번째 자식을 chlld에 넣어준다
-            while (child != null)  //자식이 없을때까지 반복
-            {
-                AutomationElementWrapper caew = new AutomationElementWrapper(child);  //마찬가지로 자식도 하위 프로세스가 있으므로 add를 쉽게하기위해
-                                                                                      // wrapping을 해준다
-                automationElementWrapper.Add(caew);
-                TraverseElement(walker, caew);  //자식을 다시 매개변수로 넣어 재귀로 트리를 완선시킨다.
-                child = walker.GetNextSibling(child);  //한 자식에 대한 정보가 완료된 경우 getnextsibling이란 함수로 다음 자식에대한 정보를 child에 넣고 반복
-            }
-        }
+        
 
         //트리에서 어떠한 프로세스를 클릭한 경우 그 프로세스에 대한 자세한 설명(tag)를 listview1에 출력해준다.
         //에러종류에 따라 error박스가 나타나거나 프로세스에 대한 간략한 설명만 출력해준다

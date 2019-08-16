@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Xml;
 
 namespace Inspector
 {
@@ -71,14 +72,47 @@ namespace Inspector
 
         }
        
-        private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
-        {
-            Point.X = mouseStruct.pt.x;
-            Point.Y = mouseStruct.pt.y;
 
+
+        private void MouseHook_LeftButtonDown(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        {
+            ButtonStop_Click("Hooker", null);
         }
 
 
+        private void ButtonStop_Click(object sender, RoutedEventArgs e)
+        {
+            timer.Stop();
+            mouseHook.Uninstall();
+
+            if(sender as string== "Hooker")
+            {
+
+                AutomationElement ae = AutomationElement.FromPoint(Point);
+                Stack<AutomationElement> automationElements = XmlController.MakeStack(ae);
+                String result = XmlController.MakeXmlFile(automationElements);
+                TextBox1.Text = result;
+
+            }
+
+        }
+
+        private void FindFromXml_Click(object sender, RoutedEventArgs e)
+        {
+            //TextBox1.Text
+            Queue<Tuple<string, string>> ElementInfoQueue  = XmlController.ReadXmlTree(TextBox1.Text);
+            AutomationElement ae = XmlController.FindAutomationElementByQueue(ElementInfoQueue);
+            if(ae == null)
+            {
+                MessageBox.Show("null ");
+
+            }
+            else
+            {
+                MessageBox.Show(ae.Current.Name);
+            }
+
+        }
 
         private void DrawBox(object sender, EventArgs e)
         {
@@ -91,7 +125,7 @@ namespace Inspector
             System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Aqua);
 
             graphics.DrawRectangle(
-                pen, 
+                pen,
                 (float)ae.Current.BoundingRectangle.X, (float)ae.Current.BoundingRectangle.Y,
                 (float)ae.Current.BoundingRectangle.Width, (float)ae.Current.BoundingRectangle.Height);
 
@@ -120,46 +154,16 @@ namespace Inspector
             //g.Dispose();
 
         }
-
-
-
-
-        private void MouseHook_LeftButtonDown(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
-
-            timer.Stop();
-            mouseHook.Uninstall();
-
-            try
-            {
-                AutomationElement ae = AutomationElement.FromPoint(Point);
-                TreeWalker walker = TreeWalker.RawViewWalker;
-                ElementInfoListView.Items.Clear();
-                ElementInfoListView.Items.Add(ae.Current.Name);
-                FindParents(walker, ae);
-            }
-            catch (System.Runtime.InteropServices.COMException)
-            {
-                MessageBox.Show("System.Runtime.InteropServices.COMException");
-            }
+            Point.X = mouseStruct.pt.x;
+            Point.Y = mouseStruct.pt.y;
 
         }
 
-        private void FindParents(TreeWalker walker, AutomationElement ae)
+        private void ButtonLoadXml_Click(object sender, RoutedEventArgs e)
         {
-            AutomationElement parent = walker.GetParent(ae);
-            if (parent != null)
-            {
-                ElementInfoListView.Items.Add(parent.Current.Name);
-                FindParents(walker, parent);
-            }
-        }
 
-
-        private void ButtonStop_Click(object sender, RoutedEventArgs e)
-        {
-            timer.Stop();
-            mouseHook.Uninstall();
         }
     }
 }
