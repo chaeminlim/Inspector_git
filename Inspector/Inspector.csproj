@@ -69,6 +69,7 @@
     <Compile Include="Selector\Selector.cs" />
     <Compile Include="Wrapper\AutomationElementWrapper.cs" />
     <Compile Include="Wrapper\TreeViewWrapper.cs" />
+    <Compile Include="XmlController.cs" />
     <Page Include="Loading.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

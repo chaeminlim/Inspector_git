@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -27,21 +28,31 @@ namespace Inspector
 
     public partial class SelectorPage : Window
     {
+        [DllImport("User32.dll")]
+        public static extern IntPtr GetDC(IntPtr hwnd);
+        [DllImport("User32.dll")]
+        public static extern void ReleaseDC(IntPtr hwnd, IntPtr dc);
+        [DllImport("gdi32.dll")]
+        static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
         public System.Windows.Point Point;
         private MouseHook mouseHook;
         private DispatcherTimer timer;
-        private IntPtr desktopPtr;
-        private Graphics graphics;
+        private AutomationElement selectedElement { get; set; }
+
 
         public SelectorPage()
         {
             InitializeComponent();
+            
         }
 
         private void Window_Initialized(object sender, EventArgs e)
         {
             mouseHook = new MouseHook();
             timer = new DispatcherTimer();    //객체생성
+
+            
 
         }
 
@@ -53,32 +64,49 @@ namespace Inspector
             mouseHook.LeftButtonDown += MouseHook_LeftButtonDown;
             mouseHook.Install();
 
+            //EventHandler EventHandler1 = new EventHandler();
+            //timer.Interval = TimeSpan.FromMilliseconds(1000);    //시간간격 설정
+            //timer.Tick += EventHandler1;
+            //timer.Start();
 
-            timer.Interval = TimeSpan.FromMilliseconds(100);    //시간간격 설정
-            timer.Tick += new EventHandler(DrawBox);
-            timer.Start();
+        }
+       
+        private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        {
+            Point.X = mouseStruct.pt.x;
+            Point.Y = mouseStruct.pt.y;
 
         }
 
 
+
         private void DrawBox(object sender, EventArgs e)
         {
-            desktopPtr = Graphics.FromHwnd(IntPtr.Zero).GetHdc();
-            graphics = Graphics.FromHdc(desktopPtr);
-
             AutomationElement ae = AutomationElement.FromPoint(Point);
-            if(ae.Current.ControlType == ControlType.Button)
-            {
-                System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Aqua);
-                graphics.DrawRectangle(pen, (float)ae.Current.BoundingRectangle.X, (float)ae.Current.BoundingRectangle.Y,
-                    (float)ae.Current.BoundingRectangle.Width, (float)ae.Current.BoundingRectangle.Height);
-                SolidBrush semiTransBrush = new SolidBrush(System.Drawing.Color.FromArgb(128, 0, 0, 255));
-                graphics.FillRectangle(semiTransBrush, (float)ae.Current.BoundingRectangle.X, (float)ae.Current.BoundingRectangle.Y,
-                    (float)ae.Current.BoundingRectangle.Width, (float)ae.Current.BoundingRectangle.Height);
-                graphics.Dispose();
-            }
 
-            
+
+            Graphics graphics = Graphics.FromHwnd((IntPtr)ae.Current.NativeWindowHandle);
+
+
+            System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Aqua);
+
+            graphics.DrawRectangle(
+                pen, 
+                (float)ae.Current.BoundingRectangle.X, (float)ae.Current.BoundingRectangle.Y,
+                (float)ae.Current.BoundingRectangle.Width, (float)ae.Current.BoundingRectangle.Height);
+
+            graphics.Dispose();
+
+
+            //SolidBrush semiTransBrush = new SolidBrush(System.Drawing.Color.FromArgb(128, 0, 0, 255));
+
+
+            //graphics.Dispose();
+
+
+
+            //     이 System.Drawing.Graphics의 System.Drawing.Graphics.GetHdc 메서드에 대한 이전 호출에서 얻은
+            //     장치 컨텍스트 핸들을 해제합니다.
             //Graphics g = Graphics.FromHdc(desktopPtr);
             //System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Blue);
             //System.Drawing.Brush brush = new System.Drawing.SolidBrush(System.Drawing.Color.Yellow);
@@ -92,12 +120,8 @@ namespace Inspector
             //g.Dispose();
 
         }
-        [DllImport("User32.dll")]
-        public static extern IntPtr GetDC(IntPtr hwnd);
-        [DllImport("User32.dll")]
-        public static extern void ReleaseDC(IntPtr hwnd, IntPtr dc);
-        [DllImport("gdi32.dll")]
-        static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
+
 
 
         private void MouseHook_LeftButtonDown(MouseHook.MSLLHOOKSTRUCT mouseStruct)
@@ -118,28 +142,18 @@ namespace Inspector
             {
                 MessageBox.Show("System.Runtime.InteropServices.COMException");
             }
-            
 
-            
         }
 
         private void FindParents(TreeWalker walker, AutomationElement ae)
         {
             AutomationElement parent = walker.GetParent(ae);
-            if(parent != null)
+            if (parent != null)
             {
                 ElementInfoListView.Items.Add(parent.Current.Name);
                 FindParents(walker, parent);
             }
         }
-
-
-        private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
-        {
-            Point.X = mouseStruct.pt.x;
-            Point.Y = mouseStruct.pt.y;
-        }
-
 
 
         private void ButtonStop_Click(object sender, RoutedEventArgs e)
@@ -149,3 +163,4 @@ namespace Inspector
         }
     }
 }
+
