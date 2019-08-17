@@ -87,24 +87,30 @@ namespace Inspector
 
             if(sender as string== "Hooker")
             {
-                try
+                Thread t =
+                new Thread(new ThreadStart(TryMethod));
+                t.Start();              
+            }
+        }
+        private void TryMethod()
+        {
+            try
+            {
+                Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
                     AutomationElement ae = AutomationElement.FromPoint(Point);
                     Stack<AutomationElement> automationElements = XmlController.MakeStack(ae);
                     String result = XmlController.MakeXmlFile(automationElements);
                     TextBox1.Text = result;
                     this.WindowState = WindowState.Normal;
-                }
-                catch (COMException)
-                {
-                    MessageBox.Show("응용 프로그램이 입력 동기화된 호출을 전달하고 있으므로 나가는 호출을 할 수 없습니다." +
-                        "(예외가 발생한 HRESULT: 0x8001010D (RPC_E_CANTCALLOUT_ININPUTSYNCCALL))"); 
-                }
-                
+                }));
+
             }
-
-            
-
+            catch (COMException)
+            {
+                MessageBox.Show("응용 프로그램이 입력 동기화된 호출을 전달하고 있으므로 나가는 호출을 할 수 없습니다." +
+                    "(예외가 발생한 HRESULT: 0x8001010D (RPC_E_CANTCALLOUT_ININPUTSYNCCALL))");
+            }
         }
 
         private void FindFromXml_Click(object sender, RoutedEventArgs e)
