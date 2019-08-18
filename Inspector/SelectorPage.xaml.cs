@@ -59,7 +59,7 @@ namespace Inspector
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
-            //this.WindowState = WindowState.Minimized;
+            this.WindowState = WindowState.Minimized;
 
             mouseHook.MouseMove += MouseHook_MouseMove;
             mouseHook.LeftButtonDown += MouseHook_LeftButtonDown;
@@ -87,31 +87,55 @@ namespace Inspector
 
             if(sender as string== "Hooker")
             {
-
-                AutomationElement ae = AutomationElement.FromPoint(Point);
-                Stack<AutomationElement> automationElements = XmlController.MakeStack(ae);
-                String result = XmlController.MakeXmlFile(automationElements);
-                TextBox1.Text = result;
+                Thread t =
+                new Thread(new ThreadStart(TryMethod));
+                t.Start();              
+            }
+        }
+        private void TryMethod()
+        {
+            try
+            {
+                Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                {
+                    AutomationElement ae = AutomationElement.FromPoint(Point);
+                    Stack<AutomationElement> automationElements = XmlController.MakeStack(ae);
+                    String result = XmlController.MakeXmlFile(automationElements);
+                    TextBox1.Text = result;
+                    this.WindowState = WindowState.Normal;
+                }));
 
             }
-
+            catch (COMException)
+            {
+                MessageBox.Show("응용 프로그램이 입력 동기화된 호출을 전달하고 있으므로 나가는 호출을 할 수 없습니다." +
+                    "(예외가 발생한 HRESULT: 0x8001010D (RPC_E_CANTCALLOUT_ININPUTSYNCCALL))");
+            }
         }
 
         private void FindFromXml_Click(object sender, RoutedEventArgs e)
         {
-            //TextBox1.Text
-            Queue<Tuple<string, string>> ElementInfoQueue  = XmlController.ReadXmlTree(TextBox1.Text);
-            AutomationElement ae = XmlController.FindAutomationElementByQueue(ElementInfoQueue);
-            if(ae == null)
+            string xmlData = TextBox1.Text;
+            AutomationElement returnVal = XmlController.ReadXml(xmlData);
+            if(returnVal == null)
             {
-                MessageBox.Show("null ");
-
+                MessageBox.Show(" 못찾았습니다. 혹은 에러입니다. ");
             }
             else
             {
-                MessageBox.Show(ae.Current.Name);
+                MessageBox.Show("찾았습니다." + returnVal.Current.Name);
+                HighLightElement(returnVal);
             }
+        }
 
+        private void HighLightElement(AutomationElement returnVal)
+        {
+            IntPtr dc = GetDC((IntPtr)returnVal.Current.NativeWindowHandle);
+            Rect rect = returnVal.Current.BoundingRectangle;
+            Rectangle(dc, (int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
+
+
+            ReleaseDC((IntPtr)returnVal.Current.NativeWindowHandle, dc);
         }
 
         private void DrawBox(object sender, EventArgs e)
@@ -163,7 +187,7 @@ namespace Inspector
 
         private void ButtonLoadXml_Click(object sender, RoutedEventArgs e)
         {
-
+            // 외부 파일을 불러오는 기능을 구현할 곳
         }
     }
 }
