@@ -2,3 +2,5 @@
 .vs/Inspector/v16/.suo
 .vs/Inspector/v16/Server/sqlite3/storage.ide
 Inspector/obj/Debug/Inspector.csprojAssemblyReference.cache
+.vs/Inspector/v16/.suo
+*.ide
