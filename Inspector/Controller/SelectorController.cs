@@ -53,7 +53,9 @@ namespace Inspector
             Stack<AutomationElement> automationElements = XmlController.MakeStack(ae);
             String result = XmlController.MakeXmlFile(automationElements);
             mainWindow.XmlBox.Text = result;
-            
+
+            mainWindow.Activate();
+
         }
     }
 }

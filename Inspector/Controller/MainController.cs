@@ -48,11 +48,19 @@ namespace Inspector
 
             foreach (Process proc in Processes)
             {
-                AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);
-                AutomationElementWrapper aew = new AutomationElementWrapper(ae);
-                TreeView.Items.Add(aew.Node);
-                aew.Node.Header = proc.ProcessName + ", " + ae.Current.Name;
-                TraverseElement(walker, aew);
+                try
+                {
+                    AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);
+                    AutomationElementWrapper aew = new AutomationElementWrapper(ae);
+                    TreeView.Items.Add(aew.Node);
+                    aew.Node.Header = proc.ProcessName + ", " + ae.Current.Name;
+                    TraverseElement(walker, aew);
+                }
+                catch(Exception)
+                {
+                    continue;
+                }
+                
             }
 
 
@@ -86,6 +94,7 @@ namespace Inspector
             ListView.Items.Clear();
 
             ListView.Items.Add("프로세스 이름: " + p.ProcessName);
+            ListView.Items.Add("프로세스 모듈 이름: " + p.MainModule.ModuleName);
             ListView.Items.Add("파일 경로" + p.MainModule.FileName);
 
             ListView.Items.Add("요소명: " + ae.Current.Name);

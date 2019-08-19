@@ -20,10 +20,13 @@ namespace Inspector
             XmlElement root  = tree.CreateElement("UI");
             tree.AppendChild(root);
 
-            XmlElement xmlElement = tree.CreateElement("process");
-            Process p = Process.GetProcessById(automationElements.Peek().Current.ProcessId);
+            XmlElement xmlElement = tree.CreateElement("Window");
+            AutomationElement wae = automationElements.Pop();
+            Process p = Process.GetProcessById(wae.Current.ProcessId);
             
-            xmlElement.SetAttribute("name", p.ProcessName);
+            xmlElement.SetAttribute("app", p.MainModule.ModuleName);
+            xmlElement.SetAttribute("class", wae.Current.ClassName);
+
             root.AppendChild(xmlElement);
 
             while (automationElements.Count > 0)
@@ -32,7 +35,11 @@ namespace Inspector
                 xmlElement = null;
                 xmlElement = tree.CreateElement("element");
                 xmlElement.SetAttribute("name", ae.Current.Name);
-                xmlElement.SetAttribute("role", ae.Current.ClassName);
+                xmlElement.SetAttribute("AutomationID", ae.Current.AutomationId);
+                xmlElement.SetAttribute("ControlType", ae.Current.ControlType.ProgrammaticName);
+                xmlElement.SetAttribute("class", ae.Current.ClassName);
+
+
                 root.AppendChild(xmlElement);
             }
             

@@ -55,39 +55,18 @@ namespace Inspector
 
         private void GetXmlButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
-                
-                Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
-                String resultString = XmlController.MakeXmlFile(automationElmements);  //스택안의 구조를 xml형태로 바꾸어 string형태로 저장
-                XmlBox.Text = resultString;  //저장된 str을 textbox위치에 출력
-
-            }
-            catch
-            {
-                try
-                {
-                    Process ps = (Process)((TreeViewItem)treeView1.SelectedItem).Tag;
-                    string resultString = ps.ProcessName + "  ";
-                    XmlBox.Text = resultString;
-
-                }
-                catch (System.NullReferenceException)  //프로세스를 클릭하지않고 버튼만 클릭한경우F
-                {
-                    MessageBox.Show("NullReferenceException");
-                }
-            }
+   
+            AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
+            Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
+            String resultString = XmlController.MakeXmlFile(automationElmements);  //스택안의 구조를 xml형태로 바꾸어 string형태로 저장
+            resultString = resultString.Replace("><", ">\n<");
+            XmlBox.Text = resultString;  //저장된 str을 textbox위치에 출력
 
         }
 
-
-        
-
-
-      
-
-
+/// <summary>
+/// //////////////////////////////////////////////////////////////////////////아래부분 수정해야됨
+/// </summary>
 
         public ListViewItem selectedListItem
         {
