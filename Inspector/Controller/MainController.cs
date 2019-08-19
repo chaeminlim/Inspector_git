@@ -69,13 +69,13 @@ namespace Inspector
         private static void TraverseElement(TreeWalker walker, AutomationElementWrapper automationElementWrapper)
         {
             Queue<AutomationElementWrapper> elementQueue = new Queue<AutomationElementWrapper>();
-            elementQueue.Enqueue(automationElementWrapper);
 
-            while(elementQueue.Count > 0)
+            elementQueue.Enqueue(automationElementWrapper);
+            while (elementQueue.Count > 0)
             {
                 AutomationElementWrapper aew = elementQueue.Dequeue();
                 AutomationElement child = walker.GetFirstChild(aew.AE);
-                while(child != null)
+                while (child != null)
                 {
                     AutomationElementWrapper caew = new AutomationElementWrapper(child);
                     aew.Add(caew);
@@ -83,6 +83,33 @@ namespace Inspector
                     child = walker.GetNextSibling(child);
                 }
             }
+            
+            #region nothiing
+            //Dictionary<int, AutomationElementWrapper> keyValuePairs = new Dictionary<int, AutomationElementWrapper>();
+            //Queue<int> elementQueue = new Queue<int>();
+
+            //int index = 1;
+            //elementQueue.Enqueue(index);
+            //keyValuePairs.Add(index, automationElementWrapper);
+            //while(elementQueue.Count > 0)
+            //{
+            //    index = index + 1;
+            //    int item = elementQueue.Dequeue();
+            //    AutomationElementWrapper aew = keyValuePairs[item];
+            //    AutomationElement child = walker.GetFirstChild(aew.AE);
+            //    while(child != null)
+            //    {
+            //        index = index + 1;
+            //        AutomationElementWrapper caew = new AutomationElementWrapper(child);
+            //        keyValuePairs.Add(index, caew);
+            //        aew.Add(caew);
+            //        elementQueue.Enqueue(index);
+            //        child = walker.GetNextSibling(child);
+            //    }
+            //}
+            #endregion
+
+
         }
 
         public void PrintSelected(TreeViewItem treeViewItem)
