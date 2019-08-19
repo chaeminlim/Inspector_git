@@ -35,27 +35,60 @@ namespace Inspector
             InitializeComponent();
         }
 
-        //change into xml버튼을 누른경우
+
         private void GetXmlButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-
                 AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
                 SelectedItem = ae;
 
                 Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
-                String resultString = XmlController.MakeXmlFile(automationElmements);
+                String resultString = XmlController.MakeXmlFile(automationElmements);  //스택안의 구조를 xml형태로 바꾸어 string형태로 저장
                 showxml.Text = resultString;  //저장된 str을 textbox위치에 출력
 
             }
-            catch (System.NullReferenceException)
+            catch
             {
-                MessageBox.Show("NullReferenceException");
+                try
+                {
+                    Process ps = (Process)((TreeViewItem)treeView1.SelectedItem).Tag;
+                    string resultString = ps.ProcessName + "  ";
+                    showxml.Text = resultString;
+
+                }
+                catch (System.NullReferenceException)  //프로세스를 클릭하지않고 버튼만 클릭한경우
+                {
+                    MessageBox.Show("NullReferenceException");
+                }
             }
 
-
         }
+        #region dummy
+        ////change into xml버튼을 누른경우
+        //private void GetXmlButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+
+        //        AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
+        //        SelectedItem = ae;
+
+        //        Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
+        //        String resultString = XmlController.MakeXmlFile(automationElmements);
+        //        showxml.Text = resultString;  //저장된 str을 textbox위치에 출력
+
+        //    }
+        //    catch (System.NullReferenceException)
+        //    {
+        //        MessageBox.Show("NullReferenceException");
+        //    }
+
+
+        //}
+
+        #endregion
+
         //getprocess버튼을 클릭했을 경우
         private void GetProcButton_Click(object sender, RoutedEventArgs e)
         {
@@ -198,5 +231,9 @@ namespace Inspector
             }
         }
 
+        private void MessageSender_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

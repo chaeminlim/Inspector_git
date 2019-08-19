@@ -7,24 +7,39 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="666" Width="1046">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-
-        <Grid Grid.Column="0">
-            <TreeView x:Name="treeView1"  SelectedItemChanged="TreeView1_SelectedItemChanged"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="10*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
+            <ToolBar>
+                <Button x:Name="GetProcButton" Content="Get Processes" HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="GetProcButton_Click"  />
+                <Button x:Name="CallSelector" Content="Selector" HorizontalAlignment="Left"  VerticalAlignment="Top" Click="CallSelector_Click" />
+                <Button x:Name="changexml" Content="Change into xml"  HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="GetXmlButton_Click"  />
+                <Button x:Name="MessageSender" Content="MessageSender" HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="MessageSender_Click" />
+            </ToolBar>
         </Grid>
-        <Grid Grid.Column="1">
-            <ListView   x:Name="listView1" HorizontalAlignment="Left"  VerticalAlignment="Top">
-            </ListView>
-        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <TreeView Grid.Row="0" x:Name="treeView1"  SelectedItemChanged="TreeView1_SelectedItemChanged" Margin="0,0,0.4,0"/>
+                <ListView  Grid.Row="1" x:Name="listView1" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
+            </Grid>
         <Grid Grid.Column="2">
+            
+        </Grid>
+        <Grid Grid.Column="3">
             <StackPanel>
-                <Button x:Name="GetProcButton" Content="Get Processes" Margin="10,10,10,10" HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="GetProcButton_Click" Width="336" />
-                <Button x:Name="CallSelector" Content="Selector" HorizontalAlignment="Left" Margin="10,10,10,10" VerticalAlignment="Top" Width="336" Click="CallSelector_Click" />
-                <Button x:Name="changexml" Content="Change into xml" Margin="10,10,10,10" HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="GetXmlButton_Click" Width="336" />
+               
                 <Label Content="xml" Margin="0,0,0.4,0"/>
                 <TextBox x:Name="showxml" Height="200" Margin="0,10,0.4,0" xml:space="preserve"/>
                 <Label Content="list" Margin="0,20,0.4,0"/>
@@ -38,6 +53,7 @@
                 <Button x:Name="CallHandler" Content="CallHandler" HorizontalAlignment="Left" Margin="0,50,0.4,0" VerticalAlignment="Top" Width="336" Click="CallHandler_Click" Height="23" />
 
             </StackPanel>
+        </Grid>
         </Grid>
     </Grid>
 </Window>
