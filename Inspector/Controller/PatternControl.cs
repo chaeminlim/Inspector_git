@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Automation;
+﻿using System.Windows.Automation;
 using System.Windows.Controls;
 
 namespace Inspector
@@ -77,7 +72,7 @@ namespace Inspector
 
 
             }
-            
+
         }
 
         private void WindowPatternController()
@@ -106,10 +101,12 @@ namespace Inspector
             if (MethodType == 1)
             {
 
-            }else if(MethodType == 2)
+            }
+            else if (MethodType == 2)
             {
 
-            }else if (MethodType == 3)
+            }
+            else if (MethodType == 3)
             {
 
             }
@@ -166,14 +163,14 @@ namespace Inspector
             {
                 expandCollapsePattern.Expand();
             }
-            else if(MethodType == 2)
+            else if (MethodType == 2)
             {
                 expandCollapsePattern.Collapse();
             }
         }
         private void GridPatternController()
         {
-            if(MethodType == 1)
+            if (MethodType == 1)
             {
 
             }

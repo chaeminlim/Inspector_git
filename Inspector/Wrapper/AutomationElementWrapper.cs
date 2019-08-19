@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Automation;
+﻿using System.Windows.Automation;
 using System.Windows.Controls;
 
 namespace Inspector
@@ -21,7 +16,7 @@ namespace Inspector
             Node = new TreeViewItem();
 
             AE = ae;
-            if(ae.Current.Name != "")
+            if (ae.Current.Name != "")
             {
                 Node.Header = ae.Current.Name;
 
@@ -43,6 +38,6 @@ namespace Inspector
         {
             Node.Items.Add(aew.Node);
         }
-        
+
     }
 }

@@ -1,22 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace Inspector
 {
@@ -25,7 +12,7 @@ namespace Inspector
     /// </summary>
     public partial class MainWindow : Window
     {
- 
+
         private MainController MainControllerObject;
 
         public MainWindow()
@@ -55,18 +42,16 @@ namespace Inspector
 
         private void GetXmlButton_Click(object sender, RoutedEventArgs e)
         {
-   
             AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
             Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
             String resultString = XmlController.MakeXmlFile(automationElmements);  //스택안의 구조를 xml형태로 바꾸어 string형태로 저장
             resultString = resultString.Replace("><", ">\n<");
             XmlBox.Text = resultString;  //저장된 str을 textbox위치에 출력
-
         }
 
-/// <summary>
-/// //////////////////////////////////////////////////////////////////////////아래부분 수정해야됨
-/// </summary>
+        /// <summary>
+        /// //////////////////////////////////////////////////////////////////////////아래부분 수정해야됨
+        /// </summary>
 
         public ListViewItem selectedListItem
         {

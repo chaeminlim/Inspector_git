@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Automation;
-using System.Windows.Controls;
 using System.Xml;
 
 namespace Inspector
@@ -17,13 +11,13 @@ namespace Inspector
         internal static string MakeXmlFile(Stack<AutomationElement> automationElements)
         {
             XmlDocument tree = new XmlDocument();
-            XmlElement root  = tree.CreateElement("UI");
+            XmlElement root = tree.CreateElement("UI");
             tree.AppendChild(root);
 
             XmlElement xmlElement = tree.CreateElement("Window");
             AutomationElement wae = automationElements.Pop();
             Process p = Process.GetProcessById(wae.Current.ProcessId);
-            
+
             xmlElement.SetAttribute("app", p.MainModule.ModuleName);
             xmlElement.SetAttribute("class", wae.Current.ClassName);
 
@@ -42,7 +36,7 @@ namespace Inspector
 
                 root.AppendChild(xmlElement);
             }
-            
+
 
             StringWriter sw = new StringWriter();
             XmlTextWriter tx = new XmlTextWriter(sw);
@@ -70,6 +64,11 @@ namespace Inspector
             return automationElements;
         }
 
+        //public static AutomationElement AutomationElementXmlFinder(string xmlData)
+        //{
+        //    Queue<AutomationElement> Filter = new Queue<AutomationElement>();
+
+        //}
         //internal static AutomationElement ReadXml(string xmlData)
         //{
         //    // xmlData를 xml 형식으로 파싱하고 다른 자료구조에 저장
@@ -149,7 +148,7 @@ namespace Inspector
         //        }
         //        returnVal1 = returnVal2;
         //    }
-            
+
         //    return returnVal2;
         //}
 
@@ -158,7 +157,7 @@ namespace Inspector
         //    string type = tuple.Item1;
         //    string name = tuple.Item2;
         //    string role = tuple.Item3;
-            
+
         //    AutomationElement child = TreeWalker.RawViewWalker.GetFirstChild(parent);
         //    List<string> list = new List<string>();
         //    while(child != null)

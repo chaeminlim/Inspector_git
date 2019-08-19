@@ -14,3 +14,11 @@ C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Insp
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.csproj.CoreCompileInputs.cache
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.exe
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.pdb
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.csprojAssemblyReference.cache
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Loading.g.cs
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\MainWindow.g.cs
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\App.g.cs
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector_MarkupCompile.cache
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector_MarkupCompile.lref
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.exe
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.pdb

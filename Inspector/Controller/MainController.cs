@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Automation;
 using System.Windows.Controls;
-using System.Xml;
 
 namespace Inspector
 {
@@ -19,11 +15,10 @@ namespace Inspector
         private ListView ListView { get; set; }
         private ListView ListView2 { get; set; }
         //생성자에서 프로세스 리스트를 불러와 객체에 저장
-       
+
         public MainController(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
-            GetProcessInit();
             TreeView = mainWindow.treeView1;
             ListView = mainWindow.listView1;
             ListView2 = mainWindow.listView2;
@@ -44,6 +39,8 @@ namespace Inspector
 
         public void MakeTree()
         {
+            GetProcessInit();
+
             TreeWalker walker = TreeWalker.RawViewWalker;
 
             foreach (Process proc in Processes)
@@ -56,11 +53,11 @@ namespace Inspector
                     aew.Node.Header = proc.ProcessName + ", " + ae.Current.Name;
                     TraverseElement(walker, aew);
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     continue;
                 }
-                
+
             }
 
 
@@ -83,7 +80,7 @@ namespace Inspector
                     child = walker.GetNextSibling(child);
                 }
             }
-            
+
             #region nothiing
             //Dictionary<int, AutomationElementWrapper> keyValuePairs = new Dictionary<int, AutomationElementWrapper>();
             //Queue<int> elementQueue = new Queue<int>();
