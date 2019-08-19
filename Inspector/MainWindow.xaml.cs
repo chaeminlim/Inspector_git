@@ -25,11 +25,7 @@ namespace Inspector
     /// </summary>
     public partial class MainWindow : Window
     {
-        public AutomationElement SelectedItem
-        {
-            get; set;
-        }
-
+ 
         private MainController MainControllerObject;
 
         public MainWindow()
@@ -39,29 +35,33 @@ namespace Inspector
             loading.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             loading.Show();
 
-            MainControllerObject = new MainController(treeView1, listView1);
+            MainControllerObject = new MainController(this);
             MainControllerObject.MakeTree();
-
 
             loading.Close();  //'로딩중'이란 창을 닫아준다.
 
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        //selector버튼을 클릭한 경우
+        private void CallSelector_Click(object sender, RoutedEventArgs e)
         {
+            SelectorController selector = new SelectorController(this);
         }
 
+        private void TreeView1_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            MainControllerObject.PrintSelected(e.NewValue as TreeViewItem);
+        }
 
         private void GetXmlButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
-                SelectedItem = ae;
-
+                
                 Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
                 String resultString = XmlController.MakeXmlFile(automationElmements);  //스택안의 구조를 xml형태로 바꾸어 string형태로 저장
-                showxml.Text = resultString;  //저장된 str을 textbox위치에 출력
+                XmlBox.Text = resultString;  //저장된 str을 textbox위치에 출력
 
             }
             catch
@@ -70,7 +70,7 @@ namespace Inspector
                 {
                     Process ps = (Process)((TreeViewItem)treeView1.SelectedItem).Tag;
                     string resultString = ps.ProcessName + "  ";
-                    showxml.Text = resultString;
+                    XmlBox.Text = resultString;
 
                 }
                 catch (System.NullReferenceException)  //프로세스를 클릭하지않고 버튼만 클릭한경우F
@@ -80,76 +80,14 @@ namespace Inspector
             }
 
         }
-        #region dummy
-        ////change into xml버튼을 누른경우
-        //private void GetXmlButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-
-        //        AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
-        //        SelectedItem = ae;
-
-        //        Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
-        //        String resultString = XmlController.MakeXmlFile(automationElmements);
-        //        showxml.Text = resultString;  //저장된 str을 textbox위치에 출력
-
-        //    }
-        //    catch (System.NullReferenceException)
-        //    {
-        //        MessageBox.Show("NullReferenceException");
-        //    }
-
-
-        //}
-
-        #endregion
-
-        //getprocess버튼을 클릭했을 경우
-        
 
 
         
 
-        //트리에서 어떠한 프로세스를 클릭한 경우 그 프로세스에 대한 자세한 설명(tag)를 listview1에 출력해준다.
-        //에러종류에 따라 error박스가 나타나거나 프로세스에 대한 간략한 설명만 출력해준다
-        private void TreeView1_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            MainControllerObject.PrintSelected(e.NewValue as TreeViewItem);
-        }
+
+      
 
 
-        //selector버튼을 클릭한 경우
-        private void CallSelector_Click(object sender, RoutedEventArgs e)
-        {
-
-            SelectorPage selectorPage = new SelectorPage();  //selectorPage라는 윈도우창을 하나 만들어서 
-            selectorPage.Owner = this;						//그 창의 정보를 가져올 수 있도록한다.
-            selectorPage.WindowState = WindowState.Normal;  //selectorPage창의 기본값을 보통창크기로 설정해준다
-            selectorPage.ShowDialog();  //해당창을 띄워준다
-
-            Selector.SelectorController(selectorPage);
-
-
-        }
-
-        private void SelectedItemController()
-        {
-            AutomationPattern[] patterns = SelectedItem.GetSupportedPatterns();  //주어진 트리노드의 컨트롤유형을 배열형태로 저장
-
-
-            listView2.Items.Clear();  //listview2부분을 초기화한뒤
-            foreach (AutomationPattern pattern in patterns)//각 컨트롤 유형에 대해서 반복문 실행
-            {
-                //    listView2.Items.Add("ProgrammaticName: " + pattern.ProgrammaticName);
-                //    listView2.Items.Add("PatternName: " + Automation.PatternName(pattern));
-
-                PatternControl pc = new PatternControl();  //컨트롤유형과 관련한 객체를 생성해서
-                pc.PatternController(pattern, SelectedItem, listView2);  //각 컨트롤유형에 따라 가능한 자동화형태를 listview2에 출력
-
-            }
-
-        }
 
         public ListViewItem selectedListItem
         {
