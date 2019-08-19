@@ -30,9 +30,25 @@ namespace Inspector
             get; set;
         }
 
+        private MainController MainControllerObject;
+
         public MainWindow()
         {
             InitializeComponent();
+            Loading loading = new Loading();  //트리뷰가 실행되기까지 loading이란 문구가 뜨도록 보여준다.
+            loading.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            loading.Show();
+
+            MainControllerObject = new MainController(treeView1, listView1);
+            MainControllerObject.MakeTree();
+
+
+            loading.Close();  //'로딩중'이란 창을 닫아준다.
+
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
         }
 
 
@@ -57,7 +73,7 @@ namespace Inspector
                     showxml.Text = resultString;
 
                 }
-                catch (System.NullReferenceException)  //프로세스를 클릭하지않고 버튼만 클릭한경우
+                catch (System.NullReferenceException)  //프로세스를 클릭하지않고 버튼만 클릭한경우F
                 {
                     MessageBox.Show("NullReferenceException");
                 }
@@ -90,15 +106,7 @@ namespace Inspector
         #endregion
 
         //getprocess버튼을 클릭했을 경우
-        private void GetProcButton_Click(object sender, RoutedEventArgs e)
-        {
-            Loading loading = new Loading();  //트리뷰가 실행되기까지 loading이란 문구가 뜨도록 보여준다.
-            loading.Show();
-            MainWindowSetter.GetProcessInit(treeView1);
-            
-
-            loading.Close();  //'로딩중'이란 창을 닫아준다.
-        }
+        
 
 
         
@@ -107,66 +115,8 @@ namespace Inspector
         //에러종류에 따라 error박스가 나타나거나 프로세스에 대한 간략한 설명만 출력해준다
         private void TreeView1_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-
-            try
-            {
-                AutomationElement ae = (AutomationElement)((TreeViewItem)e.NewValue).Tag;
-                SelectedItem = ae;
-
-                listView1.Items.Clear();
-                listView1.Items.Add("요소명: " + ae.Current.Name);
-                listView1.Items.Add("가속화 키: " + ae.Current.AcceleratorKey);
-                listView1.Items.Add("액세스 키: " + ae.Current.AccessKey);
-                listView1.Items.Add("자동화 요소 ID: " + ae.Current.AutomationId);
-                listView1.Items.Add("사각영역: " + ae.Current.BoundingRectangle);
-                listView1.Items.Add("클래스 이름: " + ae.Current.ClassName);
-                listView1.Items.Add("컨트롤 유형: " + ae.Current.ControlType.ProgrammaticName);
-                listView1.Items.Add("Framework ID: " + ae.Current.FrameworkId);
-                listView1.Items.Add("포커스 소유 : " + ae.Current.HasKeyboardFocus);
-                listView1.Items.Add("도움말: " + ae.Current.HelpText);
-                listView1.Items.Add("컨텐츠 여부: " + ae.Current.IsContentElement);
-                listView1.Items.Add("컨트롤 여부: " + ae.Current.IsControlElement);
-                listView1.Items.Add("활성화 여부: " + ae.Current.IsEnabled);
-                listView1.Items.Add("포커스 소유 가능 여부: " + ae.Current.IsKeyboardFocusable);
-                listView1.Items.Add("화면 비표시 여부: " + ae.Current.IsOffscreen);
-                listView1.Items.Add("내용 보화(패스워드) 여부: " + ae.Current.IsPassword);
-                listView1.Items.Add("IsRequiredForForm: " + ae.Current.IsRequiredForForm);
-                listView1.Items.Add("아이템 상태: " + ae.Current.ItemStatus);
-                listView1.Items.Add("아이템 형식: " + ae.Current.ItemType);
-                if (ae.Current.LabeledBy != null)
-                {
-                    listView1.Items.Add("LabledBy 이름: " + ae.Current.LabeledBy.Current.Name);
-                }
-                listView1.Items.Add("윈도우 창 핸들: " + ae.Current.NativeWindowHandle);
-                listView1.Items.Add("컨트롤 방향: " + ae.Current.Orientation);
-                listView1.Items.Add("프로세스 ID: " + ae.Current.ProcessId);
-                //
-
-
-                SelectedItemController();
-
-
-                //
-
-
-            }
-            catch (Exception)
-            {
-                try
-                {
-                    Process ps = (Process)((TreeViewItem)e.NewValue).Tag;
-                    listView1.Items.Clear();
-                    listView1.Items.Add("프로세스 id: " + ps.Id);
-                    listView1.Items.Add("프로세스 이름: " + ps.ProcessName);
-                    listView1.Items.Add("메인 창 이름: " + ps.MainWindowTitle);
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("error");
-                }
-            }
+            MainControllerObject.PrintSelected(e.NewValue as TreeViewItem);
         }
-
 
 
         //selector버튼을 클릭한 경우
@@ -235,5 +185,7 @@ namespace Inspector
         {
 
         }
+
+
     }
 }

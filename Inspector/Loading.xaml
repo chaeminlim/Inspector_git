@@ -5,7 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Inspector"
         mc:Ignorable="d"
-        Title="Loading" Height="156.433" Width="345.937">
- 
+        Title="Loading" Height="156.433" Width="345.937" WindowStyle="None" AllowsTransparency="True">
 
+    <Grid>
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+            Loading Explorer... Please Wait for a second...
+        </TextBlock>
+    </Grid>
 </Window>
