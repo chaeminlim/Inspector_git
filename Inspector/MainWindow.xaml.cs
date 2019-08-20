@@ -53,17 +53,24 @@ namespace Inspector
         {
             XmlController xmlController = new XmlController();
             String xmlData = XmlBox.Text.Replace(">\n<", "><");
-            AutomationElement ae = xmlController.XmlFinder(xmlData);
-            if(ae == null)
-            {
-                MessageBox.Show("못찾았습니다.");
-            }
+            AutomationElement ae; int count;
+
+            (count, ae) = xmlController.XmlFinder(xmlData);
+
+            if (count == 1)
+                MessageBox.Show("찾았습니다");
+            else if(count == 0)
+                MessageBox.Show("못 찾았습니다");
             else
-            {
-                MessageBox.Show("찾았습니다.");
-            }
+                MessageBox.Show("여러개를 찾았습니다. ");
+
+
         }
 
+        private void MessageSender_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
         /// <summary>
         /// //////////////////////////////////////////////////////////////////////////아래부분 수정해야됨
         /// </summary>
@@ -96,11 +103,6 @@ namespace Inspector
             {
                 MessageBox.Show("error!\n프로세스를 불러온 후 자동화 요소를 먼저 선택하세요");
             }
-        }
-
-        private void MessageSender_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         
