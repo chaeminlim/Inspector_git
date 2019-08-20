@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Automation;
@@ -18,20 +20,17 @@ namespace Inspector
             AutomationElement wae = automationElements.Pop();
             Process p = Process.GetProcessById(wae.Current.ProcessId);
 
-            xmlElement.SetAttribute("app", p.MainModule.ModuleName);
-            xmlElement.SetAttribute("class", wae.Current.ClassName);
+            xmlElement.SetAttribute("App",  p.MainModule.ModuleName);
+            xmlElement.SetAttribute("Class", wae.Current.ClassName);
 
             root.AppendChild(xmlElement);
 
             while (automationElements.Count > 0)
             {
                 AutomationElement ae = automationElements.Pop();
-                xmlElement = null;
-                xmlElement = tree.CreateElement("element");
-                xmlElement.SetAttribute("name", ae.Current.Name);
-                xmlElement.SetAttribute("AutomationID", ae.Current.AutomationId);
-                xmlElement.SetAttribute("ControlType", ae.Current.ControlType.ProgrammaticName);
-                xmlElement.SetAttribute("class", ae.Current.ClassName);
+                xmlElement = tree.CreateElement("Element");
+                xmlElement.SetAttribute("Name", ae.Current.Name);
+                xmlElement.SetAttribute("Class", ae.Current.ClassName);
 
 
                 root.AppendChild(xmlElement);
@@ -64,11 +63,154 @@ namespace Inspector
             return automationElements;
         }
 
-        //public static AutomationElement AutomationElementXmlFinder(string xmlData)
-        //{
-        //    Queue<AutomationElement> Filter = new Queue<AutomationElement>();
+        public AutomationElement XmlFinder(string xmlData)
+        {
+            XmlDocument xml = new XmlDocument();
+            xml.LoadXml(xmlData);
+            XmlElement root = xml.DocumentElement;
+            XmlNodeList nodes = root.ChildNodes;
+            Queue<XmlNode> xmlQueue = new Queue<XmlNode>();
+            foreach (XmlNode node in nodes)
+            {
+                xmlQueue.Enqueue(node);
+            }
+            Queue<AutomationElement> windowQueue = WindowXMlFinder(xmlQueue.Dequeue());
+            Queue<AutomationElement> elemQueue1 = windowQueue;
+            Queue<AutomationElement> elemQueue2 = new Queue<AutomationElement>();
 
-        //}
+            while (xmlQueue.Count > 0)
+            {
+                XmlNode xmlNode = xmlQueue.Dequeue();
+
+                elemQueue2 = ElementXMlFinder(xmlNode, elemQueue1);
+                elemQueue1 = elemQueue2;
+            }
+
+            if(elemQueue1.Count == 1)
+            {
+                return elemQueue1.Dequeue();
+            }
+            else if(elemQueue1.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+        private Queue<AutomationElement> GetProcessInit()
+        {
+            Queue<AutomationElement> procQueue = new Queue<AutomationElement>();
+
+            Process[] processes = Process.GetProcesses();
+            foreach (Process proc in processes)
+            {
+                if (proc.MainWindowHandle != IntPtr.Zero)
+                {
+                    AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);
+                    procQueue.Enqueue(ae);
+                }
+            }
+            return procQueue;
+        }
+
+
+        private Queue<AutomationElement> WindowXMlFinder(XmlNode windowNode)
+        {
+
+
+            Queue<AutomationElement> windowQueue = GetProcessInit();
+            Queue<AutomationElement> Filter1 = new Queue<AutomationElement>();
+            Queue<AutomationElement> Filter2 = new Queue<AutomationElement>();
+
+
+            foreach (XmlAttribute attribute in windowNode.Attributes)
+            {
+                if (attribute.Name == "App")
+                {
+                    while(windowQueue.Count > 0)
+                    {
+                        AutomationElement ae = windowQueue.Dequeue();
+                        Process p = Process.GetProcessById(ae.Current.ProcessId);
+
+                        if (p.MainModule.ModuleName == attribute.Value)
+                        {
+                            Filter1.Enqueue(ae);
+                        }
+                    }
+                }
+                else if (attribute.Name == "Class")
+                {
+                    while (Filter1.Count > 0)
+                    {
+                        AutomationElement ae = Filter1.Dequeue();
+                        if (ae.Current.ClassName == attribute.Value)
+                        {
+                            Filter2.Enqueue(ae);
+                        }
+                    }
+                }
+            }
+            
+            return FindChild(Filter2);
+        }
+        private Queue<AutomationElement> FindChild(Queue<AutomationElement> elemQueue)
+        {
+            Queue<AutomationElement> returnQueue = new Queue<AutomationElement>();
+
+            AutomationElement ae = elemQueue.Peek();
+            AutomationElement child = TreeWalker.RawViewWalker.GetFirstChild(ae); 
+            if(child == null)
+            {
+                return elemQueue;
+            }
+            while(child != null)
+            {
+                returnQueue.Enqueue(child);
+                child = TreeWalker.RawViewWalker.GetNextSibling(child);
+            }
+            return returnQueue;
+        }
+
+        private Queue<AutomationElement> ElementXMlFinder(XmlNode elemNode, Queue<AutomationElement> elementQueue)
+        {
+            Queue<AutomationElement> Filter1 = new Queue<AutomationElement>();
+            Queue<AutomationElement> Filter2 = new Queue<AutomationElement>();
+
+            foreach (XmlAttribute attribute in elemNode.Attributes)
+            {
+
+                if (attribute.Name == "Name")
+                {
+                    while(elementQueue.Count > 0)
+                    {
+                        AutomationElement ae = elementQueue.Dequeue();
+                        if(ae.Current.Name == attribute.Value)
+                        {
+                            Filter1.Enqueue(ae);
+                        }
+                    }
+                }
+                else if (attribute.Name == "Class")
+                {
+                    while (Filter1.Count > 0)
+                    {
+                        AutomationElement ae = Filter1.Dequeue();
+                        if (ae.Current.ClassName == attribute.Value)
+                        {
+                            Filter2.Enqueue(ae);
+                        }
+                    }
+                }
+            }
+
+            return FindChild(Filter2);
+        }
+
+
         //internal static AutomationElement ReadXml(string xmlData)
         //{
         //    // xmlData를 xml 형식으로 파싱하고 다른 자료구조에 저장

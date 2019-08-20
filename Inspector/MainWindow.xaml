@@ -17,6 +17,7 @@
             <ToolBar>
                 <Button x:Name="CallSelector" Content="Selector" HorizontalAlignment="Left"  VerticalAlignment="Top" Click="CallSelector_Click" />
                 <Button x:Name="changexml" Content="Change into xml"  HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="GetXmlButton_Click"  />
+                <Button x:Name="FindByXml" Content="FindByXml" HorizontalAlignment="Left"  VerticalAlignment="Top" Click="FindByXml_Click" />
                 <Button x:Name="CallHandler" Content="CallHandler" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CallHandler_Click" />
                 <Button x:Name="MessageSender" Content="MessageSender" HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="MessageSender_Click" />
             </ToolBar>

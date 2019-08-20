@@ -49,6 +49,21 @@ namespace Inspector
             XmlBox.Text = resultString;  //저장된 str을 textbox위치에 출력
         }
 
+        private void FindByXml_Click(object sender, RoutedEventArgs e)
+        {
+            XmlController xmlController = new XmlController();
+            String xmlData = XmlBox.Text.Replace(">\n<", "><");
+            AutomationElement ae = xmlController.XmlFinder(xmlData);
+            if(ae == null)
+            {
+                MessageBox.Show("못찾았습니다.");
+            }
+            else
+            {
+                MessageBox.Show("찾았습니다.");
+            }
+        }
+
         /// <summary>
         /// //////////////////////////////////////////////////////////////////////////아래부분 수정해야됨
         /// </summary>
@@ -88,6 +103,6 @@ namespace Inspector
 
         }
 
-
+        
     }
 }

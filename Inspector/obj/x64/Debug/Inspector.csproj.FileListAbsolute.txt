@@ -22,3 +22,12 @@ C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector_Mar
 C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector_MarkupCompile.lref
 C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.exe
 C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.pdb
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\bin\x64\Debug\Inspector.exe.config
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\bin\x64\Debug\Inspector.exe
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\bin\x64\Debug\Inspector.pdb
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Loading.baml
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\MainWindow.baml
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.g.resources
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.Properties.Resources.resources
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.csproj.GenerateResource.cache
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.csproj.CoreCompileInputs.cache
