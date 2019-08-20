@@ -31,3 +31,5 @@ C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.g.r
 C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.Properties.Resources.resources
 C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.csproj.GenerateResource.cache
 C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Inspector.csproj.CoreCompileInputs.cache
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Recorder.g.cs
+C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Recorder.baml

@@ -10,7 +10,7 @@ namespace Inspector
 {
     class XmlController
     {
-        internal static string MakeXmlFile(Stack<AutomationElement> automationElements)
+        public static string MakeXmlFile(Stack<AutomationElement> automationElements)
         {
             XmlDocument tree = new XmlDocument();
             XmlElement root = tree.CreateElement("UI");
@@ -45,8 +45,7 @@ namespace Inspector
             return strData;
 
         }
-
-        internal static Stack<AutomationElement> MakeStack(AutomationElement ae)
+        public static Stack<AutomationElement> MakeStack(AutomationElement ae)
         {
 
             Stack<AutomationElement> automationElements = new Stack<AutomationElement>();  //계층구조를 저장할 스택선언
@@ -62,7 +61,6 @@ namespace Inspector
 
             return automationElements;
         }
-
         public (int, AutomationElement) XmlFinder(string xmlData)
         {
             XmlDocument xml = new XmlDocument();
@@ -96,8 +94,6 @@ namespace Inspector
             else
                 return (elemQueue1.Count, elemQueue1.Dequeue());
         }
-
-
         private Queue<AutomationElement> GetProcessInit()
         {
             Queue<AutomationElement> procQueue = new Queue<AutomationElement>();
@@ -113,8 +109,6 @@ namespace Inspector
             }
             return procQueue;
         }
-
-
         private Queue<AutomationElement> WindowXMlFinder(XmlNode windowNode, int depth)
         {
 
@@ -186,7 +180,6 @@ namespace Inspector
             }
             
         }
-
         private Queue<AutomationElement> ElementXMlFinder(XmlNode elemNode, Queue<AutomationElement> elementQueue, int depth)
         {
             Queue<AutomationElement> Filter1 = new Queue<AutomationElement>();
@@ -221,7 +214,5 @@ namespace Inspector
 
             return FindChild(Filter2, depth);
         }
-
-
     }
 }

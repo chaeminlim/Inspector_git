@@ -1,0 +1,13 @@
+﻿<Window x:Class="Inspector.Recorder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inspector"
+        mc:Ignorable="d"
+        Title="Recorder" Height="194.712" Width="546.154" WindowStartupLocation="CenterScreen" Background="White" BorderThickness="0">
+    <Grid>
+        <Button x:Name="RecordStart" Margin="45,41,383,50.8" Content="RecordStart" Click="RecordStart_Click"/>
+        <Button x:Name="RecordStop" Content="RecordStop" Margin="216,41,212,50.8" Click="RecordStop_Click"/>
+    </Grid>
+</Window>

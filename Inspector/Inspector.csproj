@@ -95,6 +95,10 @@
     </ApplicationDefinition>
     <Compile Include="Controller\MainController.cs" />
     <Compile Include="Controller\MainWindowSetter.cs" />
+    <Compile Include="Controller\RecorderController.cs" />
+    <Compile Include="Recorder.xaml.cs">
+      <DependentUpon>Recorder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Selector\MouseHook.cs" />
     <Compile Include="Loading.xaml.cs">
       <DependentUpon>Loading.xaml</DependentUpon>
@@ -120,6 +124,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Recorder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

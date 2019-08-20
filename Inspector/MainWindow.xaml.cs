@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -64,7 +65,12 @@ namespace Inspector
             else
                 MessageBox.Show("여러개를 찾았습니다. ");
 
+        }
 
+        private void Recorder_Click(object sender, RoutedEventArgs e)
+        {
+            Recorder recorder = new Recorder(this.RecordList);
+            recorder.Show();            
         }
 
         private void MessageSender_Click(object sender, RoutedEventArgs e)
@@ -105,6 +111,11 @@ namespace Inspector
             }
         }
 
-        
+
+        private void ClearRecordList_Click(object sender, RoutedEventArgs e)
+        {
+            this.RecordList.Items.Clear();
+
+        }
     }
 }

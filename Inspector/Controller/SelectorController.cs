@@ -15,9 +15,10 @@ namespace Inspector
         [DllImport("gdi32.dll")]
         static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
+        private MainWindow mainWindow;
         public System.Windows.Point Point;
         private MouseHook mouseHook;
-        private MainWindow mainWindow;
+        
 
         public SelectorController(MainWindow mainWindow)
         {

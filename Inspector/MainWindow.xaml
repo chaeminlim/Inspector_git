@@ -9,7 +9,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*"/>
-            <RowDefinition Height="0.5*"/>
             <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
 
@@ -19,19 +18,14 @@
                 <Button x:Name="changexml" Content="Change into xml"  HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="GetXmlButton_Click"  />
                 <Button x:Name="FindByXml" Content="FindByXml" HorizontalAlignment="Left"  VerticalAlignment="Top" Click="FindByXml_Click" />
                 <Button x:Name="CallHandler" Content="CallHandler" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CallHandler_Click" />
+                <Button x:Name="Recorder" Content="Recorder" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Recorder_Click" />
+                <Button x:Name="ClearRecordList" Content="ClearRecordList" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ClearRecordList_Click" />
+
                 <Button x:Name="MessageSender" Content="MessageSender" HorizontalAlignment="Left"  VerticalAlignment="Top"  Click="MessageSender_Click" />
             </ToolBar>
         </Grid>
+        
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0">Process Tree</Label>
-            <Label Grid.Column="1">Xml</Label>
-
-        </Grid>
-        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="2*"/>
@@ -49,7 +43,15 @@
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" x:Name="XmlBox" Margin="5,0,5,5" />
+                <TabControl Grid.Row="0" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Height="265" Width="667" >
+                    <TabItem Header="Xml">
+                        <TextBlock x:Name="XmlBox"/> 
+                    </TabItem>
+                    <TabItem Header="Record">
+                        <ListBox x:Name="RecordList">
+                        </ListBox>
+                    </TabItem>
+                </TabControl>
                 <ListView Grid.Row="1" x:Name="listView2"  Margin="5,5,0,0" SelectionChanged="ListView2_SelectionChanged"  >
                     <ListView.View>
                         <GridView>
@@ -57,6 +59,7 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
+                
             </Grid>
         </Grid>
     </Grid>
