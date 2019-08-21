@@ -36,5 +36,10 @@ namespace Inspector
         {
             recorderController.Stop();
         }
+
+        private void Try_Click(object sender, RoutedEventArgs e)
+        {
+            recorderController.StartRecorded();
+        }
     }
 }
