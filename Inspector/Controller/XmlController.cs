@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Inspector.Controller;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Documents;
 using System.Xml;
 
 namespace Inspector
@@ -19,8 +23,10 @@ namespace Inspector
             XmlElement xmlElement = tree.CreateElement("Window");
             AutomationElement wae = automationElements.Pop();
             Process p = Process.GetProcessById(wae.Current.ProcessId);
-
-            xmlElement.SetAttribute("App",  p.MainModule.ModuleName);
+            xmlElement.SetAttribute("MainWindowHandle", p.MainWindowHandle.ToString());
+            xmlElement.SetAttribute("Handle", wae.Current.NativeWindowHandle.ToString());
+            xmlElement.SetAttribute("pid", p.Id.ToString());
+            xmlElement.SetAttribute("App", p.MainModule.ModuleName);
             xmlElement.SetAttribute("Class", wae.Current.ClassName);
 
             root.AppendChild(xmlElement);
@@ -75,6 +81,8 @@ namespace Inspector
                 xmlQueue.Enqueue(node);
             }
             Queue<AutomationElement> windowQueue = WindowXMlFinder(xmlQueue.Dequeue(), depth);
+            if (windowQueue.Count == 0)
+                return (100, null);
             Queue<AutomationElement> elemQueue1 = windowQueue;
             Queue<AutomationElement> elemQueue2 = new Queue<AutomationElement>();
             depth -= 1;
@@ -94,39 +102,76 @@ namespace Inspector
             else
                 return (elemQueue1.Count, elemQueue1.Dequeue());
         }
+
+        
         private Queue<AutomationElement> GetProcessInit()
         {
             Queue<AutomationElement> procQueue = new Queue<AutomationElement>();
 
             Process[] processes = Process.GetProcesses();
+            
             foreach (Process proc in processes)
             {
                 if (proc.MainWindowHandle != IntPtr.Zero)
                 {
                     AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);
                     procQueue.Enqueue(ae);
+                    //
                 }
             }
             return procQueue;
         }
+
+        //////////
+        //[DllImport("user32.dll", EntryPoint = "FindWindowEx", CharSet = CharSet.Auto)]
+        //static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+
+        //static List<IntPtr> GetAllChildrenWindowHandles(IntPtr hParent,int maxCount)
+        //{
+        //    List<IntPtr> result = new List<IntPtr>();
+        //    int ct = 0;
+        //    IntPtr prevChild = IntPtr.Zero;
+        //    IntPtr currChild = IntPtr.Zero;
+        //    while (true && ct < maxCount)
+        //    {
+        //        currChild = FindWindowEx(hParent, prevChild, null, null);
+        //        if (currChild == IntPtr.Zero) break;
+        //        result.Add(currChild);
+        //        prevChild = currChild;
+        //        ++ct;
+        //    }
+        //    return result;
+        //}
+        //////////
+
+        
         private Queue<AutomationElement> WindowXMlFinder(XmlNode windowNode, int depth)
         {
-
-
+            
             Queue<AutomationElement> windowQueue = GetProcessInit();
             Queue<AutomationElement> Filter1 = new Queue<AutomationElement>();
             Queue<AutomationElement> Filter2 = new Queue<AutomationElement>();
 
-
             foreach (XmlAttribute attribute in windowNode.Attributes)
             {
+
                 if (attribute.Name == "App")
                 {
                     while(windowQueue.Count > 0)
                     {
                         AutomationElement ae = windowQueue.Dequeue();
                         Process p = Process.GetProcessById(ae.Current.ProcessId);
+                        
+                        //if (ae.Current.ClassName == "SysShadow")
+                        //{///
+                        //    // launch app first
+                        //    List<IntPtr> children = GetAllChildrenWindowHandles(p.MainWindowHandle, 100);
 
+                        //    Console.WriteLine("Children handles are:");
+                        //    for (int i = 0; i < children.Count; ++i)
+                        //        Console.WriteLine(children[i].ToString("X"));
+                        //    ///
+                        //}
                         if (p.MainModule.ModuleName == attribute.Value)
                         {
                             Filter1.Enqueue(ae);
@@ -142,12 +187,30 @@ namespace Inspector
                         {
                             Filter2.Enqueue(ae);
                         }
+                        
                     }
                 }
             }
 
+            
+            
+
             return FindChild(Filter2, depth);
         }
+
+        private void travserse(AutomationElement ae)
+        {
+            AutomationElement child = TreeWalker.RawViewWalker.GetFirstChild(ae);
+            if(child==null)
+                Console.WriteLine("자식없음");
+            while (child != null)
+            {
+                Console.WriteLine(child.Current.Name);
+                travserse(child);
+                child = TreeWalker.RawViewWalker.GetNextSibling(child);
+            }
+        }
+
         private Queue<AutomationElement> FindChild(Queue<AutomationElement> elemQueue, int depth)
         {
             if(depth == 1)

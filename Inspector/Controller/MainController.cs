@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows.Automation;
 using System.Windows.Controls;
 
@@ -24,16 +25,27 @@ namespace Inspector
             ListView2 = mainWindow.listView2;
         }
 
+
         public void GetProcessInit()
         {
             Processes = new List<Process>();
             Process[] processes = Process.GetProcesses();
             foreach (Process proc in processes)
             {
-                if (proc.MainWindowHandle != IntPtr.Zero)
+                //if (proc.MainWindowHandle != IntPtr.Zero)
+                try
                 {
-                    Processes.Add(proc);
+                    
+                    if (proc.MainWindowHandle != IntPtr.Zero)
+                    {
+                        Processes.Add(proc);
+                    }
                 }
+                catch (Exception)
+                {
+                    continue;
+                }
+                
             }
         }
 
@@ -72,6 +84,7 @@ namespace Inspector
             {
                 AutomationElementWrapper aew = elementQueue.Dequeue();
                 AutomationElement child = walker.GetFirstChild(aew.AE);
+
                 while (child != null)
                 {
                     AutomationElementWrapper caew = new AutomationElementWrapper(child);
@@ -80,32 +93,6 @@ namespace Inspector
                     child = walker.GetNextSibling(child);
                 }
             }
-
-            #region nothiing
-            //Dictionary<int, AutomationElementWrapper> keyValuePairs = new Dictionary<int, AutomationElementWrapper>();
-            //Queue<int> elementQueue = new Queue<int>();
-
-            //int index = 1;
-            //elementQueue.Enqueue(index);
-            //keyValuePairs.Add(index, automationElementWrapper);
-            //while(elementQueue.Count > 0)
-            //{
-            //    index = index + 1;
-            //    int item = elementQueue.Dequeue();
-            //    AutomationElementWrapper aew = keyValuePairs[item];
-            //    AutomationElement child = walker.GetFirstChild(aew.AE);
-            //    while(child != null)
-            //    {
-            //        index = index + 1;
-            //        AutomationElementWrapper caew = new AutomationElementWrapper(child);
-            //        keyValuePairs.Add(index, caew);
-            //        aew.Add(caew);
-            //        elementQueue.Enqueue(index);
-            //        child = walker.GetNextSibling(child);
-            //    }
-            //}
-            #endregion
-
 
         }
 

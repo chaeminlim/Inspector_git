@@ -53,19 +53,19 @@ namespace Inspector
 
         private void AddList(Point point)
         {
-            
+
             AutomationElement ae = AutomationElement.FromPoint(point);
-            
+
 
             String xmlData = XmlController.MakeXmlFile(XmlController.MakeStack(ae));
-            
+
             RecordList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
                 ElementQueue.Enqueue(xmlData);
                 RecordList.Items.Add(xmlData);
             }));
         }
-        
+
 
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -78,8 +78,11 @@ namespace Inspector
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
 
-        [DllImportAttribute("User32.dll")]
-        private static extern IntPtr SetForegroundWindow(int hWnd);
+        [DllImport("User32.dll")]
+        private static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
@@ -94,21 +97,37 @@ namespace Inspector
         public void StartRecorded()
         {
             XmlController xmlController = new XmlController();
-            while(ElementQueue.Count > 1)
+            while (ElementQueue.Count > 1)
             {
                 String xmlData = ElementQueue.Dequeue();
                 AutomationElement ae;
                 int num;
-                Thread.Sleep(1000);
+                Thread.Sleep(1500);
                 (num, ae) = xmlController.XmlFinder(xmlData);
+                if (num == 1)
+                { }
+                else if (num == 0)
+                {
+                    MessageBox.Show("num = 0");
+                    continue;
+                }
+                else if (num == 100)
+                {
+                    MessageBox.Show("프로세스 리스트에서 못찾음");
+                    continue;
+                }
+                else
+                    MessageBox.Show("num = 2+");
+
                 Process p = Process.GetProcessById(ae.Current.ProcessId);
+                ShowWindow(p.MainWindowHandle, 10);
+                SetForegroundWindow(p.MainWindowHandle);
+                Thread.Sleep(300);
+
 
                 Point ClickablePoint = ae.GetClickablePoint();
-
                 SetCursorPos((int)ClickablePoint.X, (int)ClickablePoint.Y);
-                PostMessage(p.MainWindowHandle, (uint)WMessages.WM_LBUTTONDOWN | (uint)VKeys.VK_LBUTTON, (int)0x1, (int)MakeLParam(ClickablePoint));
-
-
+                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (int)ClickablePoint.X, (int)ClickablePoint.Y, 0, 0);
             }
 
         }

@@ -99,7 +99,8 @@ namespace Inspector
             {
                 ListViewItem lvi = selectedListItem;  //Listviewitem객체에 클릭한 노드를 넣어주고
                 PatternInfo pi = (PatternInfo)lvi.Tag;  //해당 노드의 tag(listview1의 내용)을 pi에 저장
-                pi.PatternDistinguisher();  //해당노드의 tag를 보고 자동화요소의 handler를 실행해준다
+                pi.PatternDistinguisher(); 
+                //해당노드의 tag를 보고 자동화요소의 handler를 실행해준다
                                             //TreeViewItem tvi = (TreeViewItem)treeView1.SelectedItem;
                                             //AutomationElementWrapper aew = new AutomationElementWrapper(tvi.Tag as AutomationElement);
 
