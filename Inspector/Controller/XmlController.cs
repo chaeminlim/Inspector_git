@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Documents;
@@ -23,9 +26,7 @@ namespace Inspector
             XmlElement xmlElement = tree.CreateElement("Window");
             AutomationElement wae = automationElements.Pop();
             Process p = Process.GetProcessById(wae.Current.ProcessId);
-            xmlElement.SetAttribute("MainWindowHandle", p.MainWindowHandle.ToString());
-            xmlElement.SetAttribute("Handle", wae.Current.NativeWindowHandle.ToString());
-            xmlElement.SetAttribute("pid", p.Id.ToString());
+
             xmlElement.SetAttribute("App", p.MainModule.ModuleName);
             xmlElement.SetAttribute("Class", wae.Current.ClassName);
 
@@ -67,6 +68,7 @@ namespace Inspector
 
             return automationElements;
         }
+
         public (int, AutomationElement) XmlFinder(string xmlData)
         {
             XmlDocument xml = new XmlDocument();
@@ -82,7 +84,18 @@ namespace Inspector
             }
             Queue<AutomationElement> windowQueue = WindowXMlFinder(xmlQueue.Dequeue(), depth);
             if (windowQueue.Count == 0)
-                return (100, null);
+            {
+                // 프로세스 정보가 뒤바뀌는 에러
+                AutomationElement ElementfromPoint = FinderFromPoint(xmlQueue, depth);
+                if(ElementfromPoint == null)
+                {
+                    return (100, null);
+                }
+                else
+                {
+                    return (1, ElementfromPoint);
+                }
+            }
             Queue<AutomationElement> elemQueue1 = windowQueue;
             Queue<AutomationElement> elemQueue2 = new Queue<AutomationElement>();
             depth -= 1;
@@ -103,7 +116,139 @@ namespace Inspector
                 return (elemQueue1.Count, elemQueue1.Dequeue());
         }
 
-        
+        private AutomationElement FinderFromPoint(Queue<XmlNode> xmlQueue, int depth)
+        {
+
+            XmlNode xmlNode = null;
+            String Name = null; String Class = null;
+            while(xmlQueue.Count > 0)
+            {
+                xmlNode = xmlQueue.Dequeue();
+            }
+            foreach(XmlAttribute xmlAttribute in xmlNode.Attributes)
+            {
+                if(xmlAttribute.Name == "Name")
+                {
+                    Name = xmlAttribute.Value;
+                }
+                else if (xmlAttribute.Name == "Class")
+                {
+                    Class = xmlAttribute.Value;
+                }
+            }
+            
+            AutomationElement ae_root = AutomationElement.RootElement;
+            Rect rect = ae_root.Current.BoundingRectangle;
+            Point point = new Point();
+            AutomationElement ae1, ae2 = null, result = null;
+
+            try
+            {
+                Parallel.For(0, (int)rect.Height/10,
+               (x, loopState) =>
+               {
+                   Console.WriteLine("Searching...");
+                   point.X = 10*x;
+                   for (int y = 0; y < rect.Width; y += 10)
+                   {
+                       point.Y = y;
+                       ae1 = AutomationElement.FromPoint(point);
+                       if ((ae1 != ae2) && (ae1 != null))
+                       {
+
+                           ae2 = ae1;
+                           if (ae1.Current.Name == Name && ae1.Current.ClassName == Class)
+                           {
+                               result = ae1;
+                               loopState.Stop();
+                        }
+                       }
+                   }
+               });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
+
+            if (result != null)
+            {
+                Console.WriteLine("탐색이 끝났습니다... 찾았습니다...");
+                return result;
+            }
+            else
+            {
+                Console.WriteLine("탐색이 끝났습니다... 못찾았습니다...");
+                return result;
+            }
+            //for (double x = 0; x < rect.Height; x += 5)
+            //{
+            //    Console.WriteLine("탐색중입니다...");
+            //    point.X = x;
+            //    for (double y = 0; y < rect.Width; y+= 5)
+            //    {
+            //        point.Y = y;
+            //        ae1 = AutomationElement.FromPoint(point);
+            //        if ((ae1 != ae2) && (ae1 != null))
+            //        {
+
+            //            ae2 = ae1;
+            //            if (ae1.Current.Name == Name && ae1.Current.ClassName == Class)
+            //            {
+            //                Console.WriteLine("탐색이 끝났습니다... 찾았습니다...");
+            //                return ae1;
+            //            }
+            //        }
+            //    }
+            //}
+
+        }
+
+
+        #region enumchildwindows
+        private delegate bool EnumWindowProc(IntPtr hwnd, IntPtr lParam);
+
+        [DllImport("user32")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool EnumChildWindows(IntPtr window, EnumWindowProc callback, IntPtr lParam);
+
+        public List<IntPtr> GetAllChildHandles(IntPtr hWnd)
+        {
+            List<IntPtr> childHandles = new List<IntPtr>();
+
+            GCHandle gcChildhandlesList = GCHandle.Alloc(childHandles);
+            IntPtr pointerChildHandlesList = GCHandle.ToIntPtr(gcChildhandlesList);
+
+            try
+            {
+                EnumWindowProc childProc = new EnumWindowProc(EnumWindow);
+                EnumChildWindows(hWnd, childProc, pointerChildHandlesList);
+            }
+            finally
+            {
+                gcChildhandlesList.Free();
+            }
+
+            return childHandles;
+        }
+
+        private bool EnumWindow(IntPtr hWnd, IntPtr lParam)
+        {
+            GCHandle gcChildhandlesList = GCHandle.FromIntPtr(lParam);
+
+            if (gcChildhandlesList == null || gcChildhandlesList.Target == null)
+            {
+                return false;
+            }
+
+            List<IntPtr> childHandles = gcChildhandlesList.Target as List<IntPtr>;
+            childHandles.Add(hWnd);
+
+            return true;
+        }
+        #endregion
+
         private Queue<AutomationElement> GetProcessInit()
         {
             Queue<AutomationElement> procQueue = new Queue<AutomationElement>();
@@ -112,15 +257,17 @@ namespace Inspector
             
             foreach (Process proc in processes)
             {
+
                 if (proc.MainWindowHandle != IntPtr.Zero)
                 {
                     AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);
                     procQueue.Enqueue(ae);
-                    //
+
                 }
             }
             return procQueue;
         }
+        #region FindWindowEx
 
         //////////
         //[DllImport("user32.dll", EntryPoint = "FindWindowEx", CharSet = CharSet.Auto)]
@@ -143,8 +290,8 @@ namespace Inspector
         //    return result;
         //}
         //////////
+        #endregion
 
-        
         private Queue<AutomationElement> WindowXMlFinder(XmlNode windowNode, int depth)
         {
             
@@ -161,7 +308,7 @@ namespace Inspector
                     {
                         AutomationElement ae = windowQueue.Dequeue();
                         Process p = Process.GetProcessById(ae.Current.ProcessId);
-                        
+                        #region findWindowex
                         //if (ae.Current.ClassName == "SysShadow")
                         //{///
                         //    // launch app first
@@ -172,6 +319,7 @@ namespace Inspector
                         //        Console.WriteLine(children[i].ToString("X"));
                         //    ///
                         //}
+                        #endregion
                         if (p.MainModule.ModuleName == attribute.Value)
                         {
                             Filter1.Enqueue(ae);

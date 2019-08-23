@@ -104,6 +104,8 @@ namespace Inspector
                 int num;
                 Thread.Sleep(1500);
                 (num, ae) = xmlController.XmlFinder(xmlData);
+
+
                 if (num == 1)
                 { }
                 else if (num == 0)
@@ -113,13 +115,14 @@ namespace Inspector
                 }
                 else if (num == 100)
                 {
-                    MessageBox.Show("프로세스 리스트에서 못찾음");
+                    MessageBox.Show("point로도 못찾음");
                     continue;
                 }
                 else
                     MessageBox.Show("num = 2+");
 
                 Process p = Process.GetProcessById(ae.Current.ProcessId);
+                
                 ShowWindow(p.MainWindowHandle, 10);
                 SetForegroundWindow(p.MainWindowHandle);
                 Thread.Sleep(300);
