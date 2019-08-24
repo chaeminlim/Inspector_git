@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Automation;
@@ -16,7 +17,6 @@ namespace Inspector
         static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 
         private MainWindow mainWindow;
-        public System.Windows.Point Point;
         private MouseHook mouseHook;
         
 
@@ -31,22 +31,45 @@ namespace Inspector
 
             mainWindow.WindowState = WindowState.Minimized;
 
+            aeRemains = null;
         }
 
+        private AutomationElement aeRemains;
         private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
-            Point.X = mouseStruct.pt.x;
-            Point.Y = mouseStruct.pt.y;
+            System.Windows.Point point = new System.Windows.Point();
+            point.X = mouseStruct.pt.x;
+            point.Y = mouseStruct.pt.y;
+
+            AutomationElement ae1 = AutomationElement.FromPoint(point);
+            if(ae1 != aeRemains && ae1 != null)
+            {
+                IntPtr dc = GetDC((IntPtr)ae1.Current.NativeWindowHandle);
+
+                Graphics newGraphics = Graphics.FromHdc(dc);
+                //newGraphics.Dispose();
+                aeRemains = ae1;
+
+                Rect rect = aeRemains.Current.BoundingRectangle;
+                
+
+                newGraphics.DrawRectangle(new Pen(Color.Red, 3),(float)rect.X , (float)rect.Y , (float)rect.Width , (float)rect.Height);
+                newGraphics.Dispose();
+            }
+
 
         }
 
         private void MouseHook_LeftButtonDown(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
+            System.Windows.Point point = new System.Windows.Point();
+            point.X = mouseStruct.pt.x;
+            point.Y = mouseStruct.pt.y;
 
             mouseHook.Uninstall();
-            AutomationElement ae = AutomationElement.FromPoint(Point);
+            AutomationElement ae = AutomationElement.FromPoint(point);
             Stack<AutomationElement> automationElements = XmlController.MakeStack(ae);
-            String result = XmlController.MakeXmlFile(automationElements);
+            String result = XmlController.MakeXmlFile(automationElements, 0, null);
             mainWindow.XmlBox.Text = result;
 
             mainWindow.Activate();

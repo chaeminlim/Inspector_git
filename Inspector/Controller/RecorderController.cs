@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Threading;
+using System.Xml;
 
 namespace Inspector
 {
@@ -30,42 +31,82 @@ namespace Inspector
         public void Start()
         {
             mouseHook.LeftButtonDown += MouseHook_LeftButtonDown;
+        }
 
+        public void Clear()
+        {
             ElementQueue.Clear();
             RecordList.Items.Clear();
         }
-
         public void Stop()
         {
             mouseHook.LeftButtonDown -= MouseHook_LeftButtonDown;
         }
 
-        public delegate void Add(Point point);
+        public delegate void Add(Point point, int type);
+
         private void MouseHook_LeftButtonDown(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
             Point point = new Point(mouseStruct.pt.x, mouseStruct.pt.y);
             Add add = new Add(AddList);
-            IAsyncResult result = add.BeginInvoke(point, null, null);
-
-
-
+            IAsyncResult result = add.BeginInvoke(point, 1,  null, null);
         }
 
-        private void AddList(Point point)
+        //private void MouseHook_DoubleClick(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        //{
+        //    Point point = new Point(mouseStruct.pt.x, mouseStruct.pt.y);
+        //    Add add = new Add(AddList);
+        //    IAsyncResult result = add.BeginInvoke(point, 2,  null, null);
+        //}
+
+
+        private void AddList(Point point, int type)
         {
 
             AutomationElement ae = AutomationElement.FromPoint(point);
+            String inputText = null;
+            if (ae != null)
+            {
+                AutomationPattern[] aps = ae.GetSupportedPatterns();
+                foreach (AutomationPattern ap in aps)
+                {
+                    //Console.WriteLine(ap.ProgrammaticName);
+                    if (ap == ValuePattern.Pattern)
+                    {
+                        ValuePattern valuePattern = ae.GetCurrentPattern(ValuePattern.Pattern) as ValuePattern;
+                        if (valuePattern.Current.IsReadOnly == false)
+                        {
+                            RecordList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                            {
+                                Stop();
+
+                                InputBox inputBox = new InputBox();
+                                inputBox.ShowDialog();
+                                inputText = inputBox.InputText.Text;
+                                if (inputText == "")
+                                {
+                                    type = 2; //dbclcik
+                                }
+                                else
+                                {
+                                    type = 3; 
+                                }
+                                Start();
+                            }));
 
 
-            String xmlData = XmlController.MakeXmlFile(XmlController.MakeStack(ae));
+                        }
+                    }
+                }
+            }
 
+            String xmlData = XmlController.MakeXmlFile(XmlController.MakeStack(ae), type, inputText);
             RecordList.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
                 ElementQueue.Enqueue(xmlData);
                 RecordList.Items.Add(xmlData);
             }));
         }
-
 
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -84,16 +125,21 @@ namespace Inspector
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
-        private const int MOUSEEVENTF_LEFTUP = 0x04;
-        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
-        private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        private const int MOUSEEVENTF_LEFTDOWN = 0x0002;
+        private const int MOUSEEVENTF_LEFTUP = 0x0004;
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        private const int MOUSEEVENTF_RIGHTUP = 0x0010;
+        private const int MOUSEEVENTF_MIDDLEDOWN = 0x0020;
+        private const int MOUSEEVENTF_MIDDLEUP = 0x0040;
+        private const int MOUSEEVENTF_WHEEL = 0x10; // dwData 
+     
 
 
         const int WM_LBUTTONDOWN = 0x0201;
         const int WM_LBUTTONUP = 0x0202;
 
         public static int MakeLParam(Point ptr) => ((int)ptr.Y << 16) | ((int)ptr.X & 0xffff);
+
         public void StartRecorded()
         {
             XmlController xmlController = new XmlController();
@@ -111,15 +157,13 @@ namespace Inspector
                 else if (num == 0)
                 {
                     MessageBox.Show("num = 0");
-                    continue;
-                }
-                else if (num == 100)
-                {
-                    MessageBox.Show("point로도 못찾음");
-                    continue;
+                    break;
                 }
                 else
+                {
                     MessageBox.Show("num = 2+");
+                    break;
+                }
 
                 Process p = Process.GetProcessById(ae.Current.ProcessId);
                 
@@ -127,13 +171,81 @@ namespace Inspector
                 SetForegroundWindow(p.MainWindowHandle);
                 Thread.Sleep(300);
 
+                DoAction(xmlData, ae);
+            }
 
+        }
+
+        private void DoAction(string xmlData, AutomationElement ae)
+        {
+
+            XmlDocument xml = new XmlDocument();
+            xml.LoadXml(xmlData);
+            XmlElement root = xml.DocumentElement;
+            XmlNodeList nodes = root.ChildNodes;
+
+            String inputString = null;
+            foreach(XmlAttribute xmlAttribute in nodes[0].Attributes)
+            {
+                if (xmlAttribute.Name == "Type")
+                {
+                    if (xmlAttribute.Value == "Click")
+                    {
+                        ClickActionInvoker(ae);
+                    }else if (xmlAttribute.Value == "DBClick")
+                    {
+                        DBClickActionInvoker(ae);
+                    }else if (xmlAttribute.Value == "TextInput")
+                    {
+                        continue;
+                    }
+                }
+                else if(xmlAttribute.Name == "Value")
+                {
+                    inputString = xmlAttribute.Value;
+                    TextActionInvoker(ae, inputString);
+                }
+            }
+        }
+
+        
+
+        private void ClickActionInvoker(AutomationElement ae)
+        {
+            try
+            {
                 Point ClickablePoint = ae.GetClickablePoint();
                 SetCursorPos((int)ClickablePoint.X, (int)ClickablePoint.Y);
                 mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (int)ClickablePoint.X, (int)ClickablePoint.Y, 0, 0);
             }
+            catch (ElementNotAvailableException e)
+            {
 
+            }
         }
+
+        private void DBClickActionInvoker(AutomationElement ae)
+        {
+            try
+            {
+                Point ClickablePoint = ae.GetClickablePoint();
+                SetCursorPos((int)ClickablePoint.X, (int)ClickablePoint.Y);
+                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (int)ClickablePoint.X, (int)ClickablePoint.Y, 0, 0);
+                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (int)ClickablePoint.X, (int)ClickablePoint.Y, 0, 0);
+
+            }
+            catch (ElementNotAvailableException e)
+            {
+
+            }
+        }
+        private void TextActionInvoker(AutomationElement ae, string inputString)
+        {
+            ValuePattern valuePattern = ae.GetCurrentPattern(ValuePattern.Pattern) as ValuePattern;
+            valuePattern.SetValue(inputString);
+            
+        }
+
 
         #region Enumeration
         /// <summary>

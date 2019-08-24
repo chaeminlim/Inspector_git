@@ -41,5 +41,11 @@ namespace Inspector
         {
             recorderController.StartRecorded();
         }
+
+        private void RecordClear_Click(object sender, RoutedEventArgs e)
+        {
+            recorderController.Clear();
+
+        }
     }
 }

@@ -36,3 +36,5 @@ C:\Users\Chaemin Lim\Desktop\Inspector_git\Inspector\obj\x64\Debug\Recorder.baml
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.csprojAssemblyReference.cache
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Recorder.g.cs
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Recorder.baml
+C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\InputBox.g.cs
+C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\InputBox.baml

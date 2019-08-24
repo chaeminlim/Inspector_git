@@ -46,7 +46,7 @@ namespace Inspector
         {
             AutomationElement ae = (AutomationElement)((TreeViewItem)treeView1.SelectedItem).Tag;
             Stack<AutomationElement> automationElmements = XmlController.MakeStack(ae);
-            String resultString = XmlController.MakeXmlFile(automationElmements);  //스택안의 구조를 xml형태로 바꾸어 string형태로 저장
+            String resultString = XmlController.MakeXmlFile(automationElmements, 0, null);  //스택안의 구조를 xml형태로 바꾸어 string형태로 저장
             resultString = resultString.Replace("><", ">\n<");
             XmlBox.Text = resultString;  //저장된 str을 textbox위치에 출력
         }

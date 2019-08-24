@@ -26,43 +26,39 @@ namespace Inspector
         }
 
 
-        public void GetProcessInit()
+        public Queue<AutomationElement> GetRootInit()
         {
-            Processes = new List<Process>();
-            Process[] processes = Process.GetProcesses();
-            foreach (Process proc in processes)
+            Queue<AutomationElement> aeQueue = new Queue<AutomationElement>();
+            //
+            Condition conditions = new PropertyCondition(AutomationElement.IsEnabledProperty, true);
+
+
+
+            AutomationElement root = AutomationElement.RootElement;
+            AutomationElementCollection aec =  root.FindAll(TreeScope.Children, conditions);
+            foreach(AutomationElement ae in aec)
             {
-                //if (proc.MainWindowHandle != IntPtr.Zero)
-                try
-                {
-                    
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        Processes.Add(proc);
-                    }
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-                
+                aeQueue.Enqueue(ae);
             }
+            return aeQueue;
         }
 
         public void MakeTree()
         {
-            GetProcessInit();
+            Queue<AutomationElement> aeQueue =  GetRootInit();
 
             TreeWalker walker = TreeWalker.RawViewWalker;
 
-            foreach (Process proc in Processes)
+            while(aeQueue.Count > 0)
             {
                 try
                 {
-                    AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);
+                    AutomationElement ae = aeQueue.Dequeue();
                     AutomationElementWrapper aew = new AutomationElementWrapper(ae);
                     TreeView.Items.Add(aew.Node);
-                    aew.Node.Header = proc.ProcessName + ", " + ae.Current.Name;
+                    Process p = Process.GetProcessById(ae.Current.ProcessId);
+
+                    aew.Node.Header = p.MainModule.ModuleName + ", "+ ae.Current.Name;
                     TraverseElement(walker, aew);
                 }
                 catch (Exception)
@@ -100,34 +96,35 @@ namespace Inspector
         {
             AutomationElement ae = (AutomationElement)(treeViewItem).Tag;
 
-            Process p = Process.GetProcessById(ae.Current.ProcessId);
-
-            ListView.Items.Clear();
-
-            ListView.Items.Add("프로세스 이름: " + p.ProcessName);
-            ListView.Items.Add("프로세스 모듈 이름: " + p.MainModule.ModuleName);
-            ListView.Items.Add("파일 경로" + p.MainModule.FileName);
-
-            ListView.Items.Add("요소명: " + ae.Current.Name);
-            ListView.Items.Add("가속화 키: " + ae.Current.AcceleratorKey);
-            ListView.Items.Add("액세스 키: " + ae.Current.AccessKey);
-            ListView.Items.Add("자동화 요소 ID: " + ae.Current.AutomationId);
-            ListView.Items.Add("클래스 이름: " + ae.Current.ClassName);
-            ListView.Items.Add("컨트롤 유형: " + ae.Current.ControlType.ProgrammaticName);
-            ListView.Items.Add("Framework ID: " + ae.Current.FrameworkId);
-            ListView.Items.Add("포커스 소유 : " + ae.Current.HasKeyboardFocus);
-            ListView.Items.Add("도움말: " + ae.Current.HelpText);
-            ListView.Items.Add("컨텐츠 여부: " + ae.Current.IsContentElement);
-            ListView.Items.Add("컨트롤 여부: " + ae.Current.IsControlElement);
-            ListView.Items.Add("활성화 여부: " + ae.Current.IsEnabled);
-            ListView.Items.Add("포커스 소유 가능 여부: " + ae.Current.IsKeyboardFocusable);
-            ListView.Items.Add("화면 비표시 여부: " + ae.Current.IsOffscreen);
-            ListView.Items.Add("내용 보화(패스워드) 여부: " + ae.Current.IsPassword);
-            ListView.Items.Add("IsRequiredForForm: " + ae.Current.IsRequiredForForm);
-            ListView.Items.Add("아이템 상태: " + ae.Current.ItemStatus);
-            ListView.Items.Add("아이템 형식: " + ae.Current.ItemType);
+            
             try
             {
+                Process p = Process.GetProcessById(ae.Current.ProcessId);
+
+                ListView.Items.Clear();
+
+                ListView.Items.Add("프로세스 이름: " + p.ProcessName);
+                ListView.Items.Add("프로세스 모듈 이름: " + p.MainModule.ModuleName);
+                ListView.Items.Add("파일 경로" + p.MainModule.FileName);
+
+                ListView.Items.Add("요소명: " + ae.Current.Name);
+                ListView.Items.Add("가속화 키: " + ae.Current.AcceleratorKey);
+                ListView.Items.Add("액세스 키: " + ae.Current.AccessKey);
+                ListView.Items.Add("자동화 요소 ID: " + ae.Current.AutomationId);
+                ListView.Items.Add("클래스 이름: " + ae.Current.ClassName);
+                ListView.Items.Add("컨트롤 유형: " + ae.Current.ControlType.ProgrammaticName);
+                ListView.Items.Add("Framework ID: " + ae.Current.FrameworkId);
+                ListView.Items.Add("포커스 소유 : " + ae.Current.HasKeyboardFocus);
+                ListView.Items.Add("도움말: " + ae.Current.HelpText);
+                ListView.Items.Add("컨텐츠 여부: " + ae.Current.IsContentElement);
+                ListView.Items.Add("컨트롤 여부: " + ae.Current.IsControlElement);
+                ListView.Items.Add("활성화 여부: " + ae.Current.IsEnabled);
+                ListView.Items.Add("포커스 소유 가능 여부: " + ae.Current.IsKeyboardFocusable);
+                ListView.Items.Add("화면 비표시 여부: " + ae.Current.IsOffscreen);
+                ListView.Items.Add("내용 보화(패스워드) 여부: " + ae.Current.IsPassword);
+                ListView.Items.Add("IsRequiredForForm: " + ae.Current.IsRequiredForForm);
+                ListView.Items.Add("아이템 상태: " + ae.Current.ItemStatus);
+                ListView.Items.Add("아이템 형식: " + ae.Current.ItemType);
                 ListView.Items.Add("사각영역: " + ae.Current.BoundingRectangle);
 
             }

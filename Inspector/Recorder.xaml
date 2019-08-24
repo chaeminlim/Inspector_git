@@ -8,8 +8,10 @@
         Title="Recorder" Height="194.712" Width="546.154" WindowStartupLocation="CenterScreen" Background="White" BorderThickness="0">
     <Grid>
         <Button x:Name="RecordStart" Margin="45,41,383,50.8" Content="RecordStart" Click="RecordStart_Click"/>
-        <Button x:Name="RecordStop" Content="RecordStop" Margin="216,41,212,50.8" Click="RecordStop_Click"/>
-        <Button x:Name="Try" Content="Try" Margin="386,41,42,50.8" Click="Try_Click"/>
+        <Button x:Name="RecordStop" Content="RecordStop" Margin="162,41,266,50.8" Click="RecordStop_Click"/>
+        <Button x:Name="RecordClear" Content="RecordClear" Margin="279,41,149,50.8" Click="RecordClear_Click"/>
+
+        <Button x:Name="Try" Content="Try" Margin="396,41,32,50.8" Click="Try_Click"/>
 
     </Grid>
 </Window>

@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Automation.Provider;
 using System.Windows.Documents;
 using System.Xml;
 
@@ -17,12 +18,29 @@ namespace Inspector
 {
     class XmlController
     {
-        public static string MakeXmlFile(Stack<AutomationElement> automationElements)
+        public static string MakeXmlFile(Stack<AutomationElement> automationElements, int type, string inputText)
         {
             XmlDocument tree = new XmlDocument();
             XmlElement root = tree.CreateElement("UI");
             tree.AppendChild(root);
 
+
+            XmlElement Action = tree.CreateElement("Action");
+            if(type == 0)
+                Action.SetAttribute("Type", "NULL");
+            else if (type == 1)
+                Action.SetAttribute("Type", "Click");
+            else if (type == 2)
+                Action.SetAttribute("Type", "DBClick");
+            else if (type == 3)
+            {
+                Action.SetAttribute("Type", "TextInput");
+                Action.SetAttribute("Value", inputText);
+            }
+            root.AppendChild(Action);
+
+
+            //
             XmlElement xmlElement = tree.CreateElement("Window");
             AutomationElement wae = automationElements.Pop();
             Process p = Process.GetProcessById(wae.Current.ProcessId);
@@ -31,7 +49,7 @@ namespace Inspector
             xmlElement.SetAttribute("Class", wae.Current.ClassName);
 
             root.AppendChild(xmlElement);
-
+            //
             while (automationElements.Count > 0)
             {
                 AutomationElement ae = automationElements.Pop();
@@ -39,9 +57,9 @@ namespace Inspector
                 xmlElement.SetAttribute("Name", ae.Current.Name);
                 xmlElement.SetAttribute("Class", ae.Current.ClassName);
 
-
                 root.AppendChild(xmlElement);
             }
+
 
 
             StringWriter sw = new StringWriter();
@@ -76,25 +94,18 @@ namespace Inspector
             XmlElement root = xml.DocumentElement;
             XmlNodeList nodes = root.ChildNodes;
             Queue<XmlNode> xmlQueue = new Queue<XmlNode>();
-            int depth = nodes.Count;
+            int depth = nodes.Count - 1; // action 정보 제거
 
             foreach (XmlNode node in nodes)
             {
                 xmlQueue.Enqueue(node);
             }
+            xmlQueue.Dequeue(); // action정보 제거
+
             Queue<AutomationElement> windowQueue = WindowXMlFinder(xmlQueue.Dequeue(), depth);
             if (windowQueue.Count == 0)
             {
                 // 프로세스 정보가 뒤바뀌는 에러
-                AutomationElement ElementfromPoint = FinderFromPoint(xmlQueue, depth);
-                if(ElementfromPoint == null)
-                {
-                    return (100, null);
-                }
-                else
-                {
-                    return (1, ElementfromPoint);
-                }
             }
             Queue<AutomationElement> elemQueue1 = windowQueue;
             Queue<AutomationElement> elemQueue2 = new Queue<AutomationElement>();
@@ -115,96 +126,97 @@ namespace Inspector
             else
                 return (elemQueue1.Count, elemQueue1.Dequeue());
         }
+        #region dummy
+        //private AutomationElement FinderFromPoint(Queue<XmlNode> xmlQueue, int depth)
+        //{
 
-        private AutomationElement FinderFromPoint(Queue<XmlNode> xmlQueue, int depth)
-        {
+        //    XmlNode xmlNode = null;
+        //    String Name = null; String Class = null;
+        //    while(xmlQueue.Count > 0)
+        //    {
+        //        xmlNode = xmlQueue.Dequeue();
+        //    }
+        //    foreach(XmlAttribute xmlAttribute in xmlNode.Attributes)
+        //    {
+        //        if(xmlAttribute.Name == "Name")
+        //        {
+        //            Name = xmlAttribute.Value;
+        //        }
+        //        else if (xmlAttribute.Name == "Class")
+        //        {
+        //            Class = xmlAttribute.Value;
+        //        }
+        //    }
 
-            XmlNode xmlNode = null;
-            String Name = null; String Class = null;
-            while(xmlQueue.Count > 0)
-            {
-                xmlNode = xmlQueue.Dequeue();
-            }
-            foreach(XmlAttribute xmlAttribute in xmlNode.Attributes)
-            {
-                if(xmlAttribute.Name == "Name")
-                {
-                    Name = xmlAttribute.Value;
-                }
-                else if (xmlAttribute.Name == "Class")
-                {
-                    Class = xmlAttribute.Value;
-                }
-            }
-            
-            AutomationElement ae_root = AutomationElement.RootElement;
-            Rect rect = ae_root.Current.BoundingRectangle;
-            Point point = new Point();
-            AutomationElement ae1, ae2 = null, result = null;
+        //    AutomationElement ae_root = AutomationElement.RootElement;
+        //    Rect rect = ae_root.Current.BoundingRectangle;
+        //    Point point = new Point();
+        //    AutomationElement ae1, ae2 = null, result = null;
 
-            try
-            {
-                Parallel.For(0, (int)rect.Height/10,
-               (x, loopState) =>
-               {
-                   Console.WriteLine("Searching...");
-                   point.X = 10*x;
-                   for (int y = 0; y < rect.Width; y += 10)
-                   {
-                       point.Y = y;
-                       ae1 = AutomationElement.FromPoint(point);
-                       if ((ae1 != ae2) && (ae1 != null))
-                       {
+        //    try
+        //    {
+        //        Parallel.For(0, (int)rect.Height/10,
+        //       (x, loopState) =>
+        //       {
+        //           Console.WriteLine("Searching...");
+        //           point.X = 10*x;
+        //           for (int y = 0; y < rect.Width; y += 10)
+        //           {
+        //               point.Y = y;
+        //               ae1 = AutomationElement.FromPoint(point);
+        //               if ((ae1 != ae2) && (ae1 != null))
+        //               {
 
-                           ae2 = ae1;
-                           if (ae1.Current.Name == Name && ae1.Current.ClassName == Class)
-                           {
-                               result = ae1;
-                               loopState.Stop();
-                        }
-                       }
-                   }
-               });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            
+        //                   ae2 = ae1;
+        //                   if (ae1.Current.Name == Name && ae1.Current.ClassName == Class)
+        //                   {
+        //                       result = ae1;
+        //                       loopState.Stop();
 
-            if (result != null)
-            {
-                Console.WriteLine("탐색이 끝났습니다... 찾았습니다...");
-                return result;
-            }
-            else
-            {
-                Console.WriteLine("탐색이 끝났습니다... 못찾았습니다...");
-                return result;
-            }
-            //for (double x = 0; x < rect.Height; x += 5)
-            //{
-            //    Console.WriteLine("탐색중입니다...");
-            //    point.X = x;
-            //    for (double y = 0; y < rect.Width; y+= 5)
-            //    {
-            //        point.Y = y;
-            //        ae1 = AutomationElement.FromPoint(point);
-            //        if ((ae1 != ae2) && (ae1 != null))
-            //        {
+        //                   }
+        //               }
+        //           }
+        //       });
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e);
+        //    }
 
-            //            ae2 = ae1;
-            //            if (ae1.Current.Name == Name && ae1.Current.ClassName == Class)
-            //            {
-            //                Console.WriteLine("탐색이 끝났습니다... 찾았습니다...");
-            //                return ae1;
-            //            }
-            //        }
-            //    }
-            //}
 
-        }
+        //    if (result != null)
+        //    {
+        //        Console.WriteLine("탐색이 끝났습니다... 찾았습니다...");
+        //        return result;
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("탐색이 끝났습니다... 못찾았습니다...");
+        //        return result;
+        //    }
+        //    //for (double x = 0; x < rect.Height; x += 5)
+        //    //{
+        //    //    Console.WriteLine("탐색중입니다...");
+        //    //    point.X = x;
+        //    //    for (double y = 0; y < rect.Width; y+= 5)
+        //    //    {
+        //    //        point.Y = y;
+        //    //        ae1 = AutomationElement.FromPoint(point);
+        //    //        if ((ae1 != ae2) && (ae1 != null))
+        //    //        {
 
+        //    //            ae2 = ae1;
+        //    //            if (ae1.Current.Name == Name && ae1.Current.ClassName == Class)
+        //    //            {
+        //    //                Console.WriteLine("탐색이 끝났습니다... 찾았습니다...");
+        //    //                return ae1;
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //}
+
+        //}
+        #endregion
 
         #region enumchildwindows
         private delegate bool EnumWindowProc(IntPtr hwnd, IntPtr lParam);
@@ -249,23 +261,22 @@ namespace Inspector
         }
         #endregion
 
-        private Queue<AutomationElement> GetProcessInit()
+        
+        public Queue<AutomationElement> GetRootInit()
         {
-            Queue<AutomationElement> procQueue = new Queue<AutomationElement>();
+            Queue<AutomationElement> aeQueue = new Queue<AutomationElement>();
+            //
+            System.Windows.Automation.Condition conditions = new PropertyCondition(AutomationElement.IsEnabledProperty, true);
 
-            Process[] processes = Process.GetProcesses();
-            
-            foreach (Process proc in processes)
+
+
+            AutomationElement root = AutomationElement.RootElement;
+            AutomationElementCollection aec = root.FindAll(TreeScope.Children, conditions);
+            foreach (AutomationElement ae in aec)
             {
-
-                if (proc.MainWindowHandle != IntPtr.Zero)
-                {
-                    AutomationElement ae = AutomationElement.FromHandle(proc.MainWindowHandle);
-                    procQueue.Enqueue(ae);
-
-                }
+                aeQueue.Enqueue(ae);
             }
-            return procQueue;
+            return aeQueue;
         }
         #region FindWindowEx
 
@@ -295,7 +306,7 @@ namespace Inspector
         private Queue<AutomationElement> WindowXMlFinder(XmlNode windowNode, int depth)
         {
             
-            Queue<AutomationElement> windowQueue = GetProcessInit();
+            Queue<AutomationElement> windowQueue = GetRootInit();
             Queue<AutomationElement> Filter1 = new Queue<AutomationElement>();
             Queue<AutomationElement> Filter2 = new Queue<AutomationElement>();
 
@@ -424,6 +435,6 @@ namespace Inspector
             }
 
             return FindChild(Filter2, depth);
-        }
+        }   
     }
 }

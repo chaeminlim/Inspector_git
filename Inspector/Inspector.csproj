@@ -83,6 +83,7 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="UIAutomationClient" />
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -97,6 +98,9 @@
     <Compile Include="Controller\MainWindowSetter.cs" />
     <Compile Include="Controller\RecorderController.cs" />
     <Compile Include="Controller\WindowHandleInfo.cs" />
+    <Compile Include="InputBox.xaml.cs">
+      <DependentUpon>InputBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Recorder.xaml.cs">
       <DependentUpon>Recorder.xaml</DependentUpon>
     </Compile>
@@ -109,6 +113,10 @@
     <Compile Include="Wrapper\AutomationElementWrapper.cs" />
     <Compile Include="Wrapper\TreeViewWrapper.cs" />
     <Compile Include="Controller\XmlController.cs" />
+    <Page Include="InputBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Loading.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
