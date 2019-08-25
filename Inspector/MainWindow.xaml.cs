@@ -82,22 +82,23 @@ namespace Inspector
         /// //////////////////////////////////////////////////////////////////////////아래부분 수정해야됨
         /// </summary>
 
-        public ListViewItem selectedListItem
-        {
-            get; set;
-        }
-        private void ListView2_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
+        //public ListViewItem selectedListItem
+        //{
+        //    get; set;
+        //}
+        //private void ListView2_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
 
-            selectedListItem = e.AddedItems[0] as ListViewItem;
-        }
+        //    selectedListItem = e.AddedItems[0] as ListViewItem;
+        //}
 
         //call handler를 클릭한경우
         private void CallHandler_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ListViewItem lvi = selectedListItem;  //Listviewitem객체에 클릭한 노드를 넣어주고
+                
+                ListViewItem lvi = listView2.SelectedItems[0] as ListViewItem;  //Listviewitem객체에 클릭한 노드를 넣어주고
                 PatternInfo pi = (PatternInfo)lvi.Tag;  //해당 노드의 tag(listview1의 내용)을 pi에 저장
                 pi.PatternDistinguisher(); 
                 //해당노드의 tag를 보고 자동화요소의 handler를 실행해준다

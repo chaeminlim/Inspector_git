@@ -52,7 +52,7 @@
                         </ListBox>
                     </TabItem>
                 </TabControl>
-                <ListView Grid.Row="1" x:Name="listView2"  Margin="5,5,0,0" SelectionChanged="ListView2_SelectionChanged"  >
+                <ListView Grid.Row="1" x:Name="listView2"  Margin="5,5,0,0" >
                     <ListView.View>
                         <GridView>
                             <GridViewColumn/>

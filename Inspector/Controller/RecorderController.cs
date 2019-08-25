@@ -50,6 +50,7 @@ namespace Inspector
             Point point = new Point(mouseStruct.pt.x, mouseStruct.pt.y);
             Add add = new Add(AddList);
             IAsyncResult result = add.BeginInvoke(point, 1,  null, null);
+
         }
 
         //private void MouseHook_DoubleClick(MouseHook.MSLLHOOKSTRUCT mouseStruct)
@@ -64,6 +65,8 @@ namespace Inspector
         {
 
             AutomationElement ae = AutomationElement.FromPoint(point);
+            //PrintAllTree(ae);///
+
             String inputText = null;
             if (ae != null)
             {
@@ -107,6 +110,29 @@ namespace Inspector
                 RecordList.Items.Add(xmlData);
             }));
         }
+
+        //private void PrintAllTree(AutomationElement ae)
+        //{
+        //    Stack<AutomationElement> automationElements = XmlController.MakeStack(ae);
+        //    AutomationElement ans = automationElements.Pop();
+
+        //    Console.WriteLine(ans);
+            
+        //    TraverseAll(ans);
+        //}
+
+        //private void TraverseAll(AutomationElement ans)
+        //{
+        //    TreeWalker walker = TreeWalker.RawViewWalker;
+        //    AutomationElement child = walker.GetFirstChild(ans);
+        //    while(child != null)
+        //    {
+        //        Console.WriteLine(child.Current.Name);
+        //        Console.WriteLine(child.Current.IsEnabled);
+        //        TraverseAll(child);
+        //        child = walker.GetNextSibling(child);
+        //    }
+        //}
 
         [return: MarshalAs(UnmanagedType.Bool)]
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -165,10 +191,9 @@ namespace Inspector
                     break;
                 }
 
-                Process p = Process.GetProcessById(ae.Current.ProcessId);
-                
-                ShowWindow(p.MainWindowHandle, 10);
-                SetForegroundWindow(p.MainWindowHandle);
+
+                WindowControl(xmlData, ae);
+                GetXmlInfo(xmlData);
                 Thread.Sleep(300);
 
                 DoAction(xmlData, ae);
@@ -176,13 +201,43 @@ namespace Inspector
 
         }
 
-        private void DoAction(string xmlData, AutomationElement ae)
+        private string WindowHandledNow;
+        private void WindowControl(string xmlData, AutomationElement ae)
         {
+            XmlNodeList nodes = GetXmlInfo(xmlData);
 
+            foreach (XmlAttribute xmlAttribute in nodes[1].Attributes)
+            {
+                if (xmlAttribute.Name == "App")
+                {
+                    if(xmlAttribute.Value != WindowHandledNow)
+                    {
+                        WindowHandledNow = xmlAttribute.Value;
+                        Process p = Process.GetProcessById(ae.Current.ProcessId);
+                        ShowWindow(p.MainWindowHandle, 10);
+                        SetForegroundWindow(p.MainWindowHandle);
+                    }
+                       
+                    
+                }
+            }
+
+            
+        }
+
+        private XmlNodeList GetXmlInfo(string xmlData)
+        {
             XmlDocument xml = new XmlDocument();
             xml.LoadXml(xmlData);
             XmlElement root = xml.DocumentElement;
             XmlNodeList nodes = root.ChildNodes;
+            return nodes;
+        }
+
+        private void DoAction(string xmlData, AutomationElement ae)
+        {
+
+            XmlNodeList nodes = GetXmlInfo(xmlData);
 
             String inputString = null;
             foreach(XmlAttribute xmlAttribute in nodes[0].Attributes)
@@ -212,6 +267,13 @@ namespace Inspector
 
         private void ClickActionInvoker(AutomationElement ae)
         {
+            object v;
+
+            if (ae.TryGetCurrentPattern(SelectionItemPattern.Pattern, out v))
+            {
+                var selectPattern = (SelectionItemPattern)v;
+                selectPattern.Select();
+            }
             try
             {
                 Point ClickablePoint = ae.GetClickablePoint();
@@ -220,6 +282,8 @@ namespace Inspector
             }
             catch (ElementNotAvailableException e)
             {
+                Console.WriteLine(ae.Current.Name);
+                Console.WriteLine(ae.Current.IsEnabled);
 
             }
         }
@@ -236,7 +300,7 @@ namespace Inspector
             }
             catch (ElementNotAvailableException e)
             {
-
+                Console.WriteLine(e);
             }
         }
         private void TextActionInvoker(AutomationElement ae, string inputString)

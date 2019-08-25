@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +47,20 @@ namespace Inspector
         private void RecordClear_Click(object sender, RoutedEventArgs e)
         {
             recorderController.Clear();
+
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            string[] lines = recorderController.ElementQueue.ToArray();
+
+            using (StreamWriter outputFile = new StreamWriter(@"C:\Users\Chaemin Lim\Documents\New_Xml_File.xml"))
+            {
+                foreach (string line in lines)
+                {
+                    outputFile.WriteLine(line);
+                }
+            }
 
         }
     }

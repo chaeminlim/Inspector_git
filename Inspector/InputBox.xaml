@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
 
         <Label Content="Enter some text" Margin="5"/>
-        <TextBox Grid.Row="1" x:Name="InputText" Margin="5"/>
+        <TextBox Grid.Row="1" x:Name="InputText" Margin="5"  Text="아무것도 입력하지 않으면 더블클릭으로 변환됩니다." />
         <Button Grid.Row="2" Content="OK" Margin="5" Click="Button_Click"/>
         <Label Grid.Row="3" Name="MyLabel" Margin="5"/>
     </Grid>
