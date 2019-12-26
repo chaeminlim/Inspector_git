@@ -15,8 +15,7 @@ namespace Inspector
         private TreeView TreeView { get; set; }
         private ListView ListView { get; set; }
         private ListView ListView2 { get; set; }
-        //생성자에서 프로세스 리스트를 불러와 객체에 저장
-
+        
         public MainController(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
@@ -29,17 +28,31 @@ namespace Inspector
         public Queue<AutomationElement> GetRootInit()
         {
             Queue<AutomationElement> aeQueue = new Queue<AutomationElement>();
-            //
-            Condition conditions = new PropertyCondition(AutomationElement.IsEnabledProperty, true);
 
-
+            //Condition conditions = new PropertyCondition(AutomationElement.IsEnabledProperty, true);
+            Condition conditions = Condition.TrueCondition;
 
             AutomationElement root = AutomationElement.RootElement;
             AutomationElementCollection aec =  root.FindAll(TreeScope.Children, conditions);
+            
             foreach(AutomationElement ae in aec)
             {
                 aeQueue.Enqueue(ae);
             }
+            
+            ///
+            /// get from process list
+            ///
+            /*
+            Process[] allProcesses = Process.GetProcesses();
+            foreach(Process proc in allProcesses)
+            {
+                Condition tempCondition = new PropertyCondition(AutomationElement.ProcessIdProperty, proc.Id);
+                AutomationElement ae = AutomationElement.RootElement.FindFirst(TreeScope.Element | TreeScope.Children, tempCondition);
+                if (ae != null)
+                    aeQueue.Enqueue(ae);
+            }
+            */
             return aeQueue;
         }
 

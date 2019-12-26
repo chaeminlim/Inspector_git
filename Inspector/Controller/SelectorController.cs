@@ -37,11 +37,13 @@ namespace Inspector
         private AutomationElement aeRemains;
         private void MouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
+            /*
             System.Windows.Point point = new System.Windows.Point();
             point.X = mouseStruct.pt.x;
             point.Y = mouseStruct.pt.y;
 
             AutomationElement ae1 = AutomationElement.FromPoint(point);
+            
             if(ae1 != aeRemains && ae1 != null)
             {
                 IntPtr dc = GetDC((IntPtr)ae1.Current.NativeWindowHandle);
@@ -56,7 +58,7 @@ namespace Inspector
                 newGraphics.DrawRectangle(new Pen(Color.Red, 3),(float)rect.X , (float)rect.Y , (float)rect.Width , (float)rect.Height);
                 newGraphics.Dispose();
             }
-
+            */
 
         }
 

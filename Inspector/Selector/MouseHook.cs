@@ -13,6 +13,7 @@ namespace Inspector
         /// <summary>
         /// Internal callback processing function
         /// </summary>
+        
         private delegate IntPtr MouseHookHandler(int nCode, IntPtr wParam, IntPtr lParam);
         private MouseHookHandler hookHandler;
 

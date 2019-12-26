@@ -108,15 +108,21 @@ namespace Inspector
                 // 프로세스 정보가 뒤바뀌는 에러
             }
             Queue<AutomationElement> elemQueue1 = windowQueue;
-            Queue<AutomationElement> elemQueue2 = new Queue<AutomationElement>();
             depth -= 1;
 
             while (xmlQueue.Count > 0)
             {
                 XmlNode xmlNode = xmlQueue.Dequeue();
-
-                elemQueue2 = ElementXMlFinder(xmlNode, elemQueue1, depth);
-                elemQueue1 = elemQueue2;
+                // debug
+                Console.WriteLine("loop start");
+                foreach(var elem in elemQueue1)
+                {
+                    Console.WriteLine(elem.Current.Name);
+                }
+                Console.WriteLine("loop end");
+                // debug end
+                elemQueue1 = ElementXMlFinder(xmlNode, elemQueue1, depth);
+                 
                 depth -= 1;
 
             }
@@ -265,17 +271,26 @@ namespace Inspector
         public Queue<AutomationElement> GetRootInit()
         {
             Queue<AutomationElement> aeQueue = new Queue<AutomationElement>();
-            //
-            System.Windows.Automation.Condition conditions = new PropertyCondition(AutomationElement.IsEnabledProperty, true);
 
-
-
+            //System.Windows.Automation.Condition conditions = new PropertyCondition(AutomationElement.IsEnabledProperty, true);
+            //Condition conditions = new PropertyCondition(AutomationElement.IsEnabledProperty, true);
+            System.Windows.Automation.Condition conditions = System.Windows.Automation.Condition.TrueCondition;
             AutomationElement root = AutomationElement.RootElement;
             AutomationElementCollection aec = root.FindAll(TreeScope.Children, conditions);
             foreach (AutomationElement ae in aec)
             {
                 aeQueue.Enqueue(ae);
             }
+            /*
+            Process[] allProcesses = Process.GetProcesses();
+            foreach (Process proc in allProcesses)
+            {
+                System.Windows.Automation.Condition tempCondition = new PropertyCondition(AutomationElement.ProcessIdProperty, proc.Id);
+                AutomationElement ae = AutomationElement.RootElement.FindFirst(TreeScope.Element | TreeScope.Children, tempCondition);
+                if (ae != null)
+                    aeQueue.Enqueue(ae);
+            }
+            */
             return aeQueue;
         }
         #region FindWindowEx
@@ -315,27 +330,24 @@ namespace Inspector
 
                 if (attribute.Name == "App")
                 {
-                    while(windowQueue.Count > 0)
+                    while (windowQueue.Count > 0)
                     {
                         AutomationElement ae = windowQueue.Dequeue();
                         Process p = Process.GetProcessById(ae.Current.ProcessId);
-                        #region findWindowex
-                        //if (ae.Current.ClassName == "SysShadow")
-                        //{///
-                        //    // launch app first
-                        //    List<IntPtr> children = GetAllChildrenWindowHandles(p.MainWindowHandle, 100);
 
-                        //    Console.WriteLine("Children handles are:");
-                        //    for (int i = 0; i < children.Count; ++i)
-                        //        Console.WriteLine(children[i].ToString("X"));
-                        //    ///
-                        //}
-                        #endregion
-                        if (p.MainModule.ModuleName == attribute.Value)
+                        try
                         {
-                            Filter1.Enqueue(ae);
+                            if (p.MainModule.ModuleName == attribute.Value)
+                            {
+                                Filter1.Enqueue(ae);
+                            }
+
                         }
-                    }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                   }
                 }
                 else if (attribute.Name == "Class")
                 {
@@ -350,9 +362,6 @@ namespace Inspector
                     }
                 }
             }
-
-            
-            
 
             return FindChild(Filter2, depth);
         }
@@ -409,13 +418,13 @@ namespace Inspector
 
             foreach (XmlAttribute attribute in elemNode.Attributes)
             {
-
                 if (attribute.Name == "Name")
                 {
                     while(elementQueue.Count > 0)
                     {
                         AutomationElement ae = elementQueue.Dequeue();
-                        if(ae.Current.Name == attribute.Value)
+
+                        if (ae.Current.Name == attribute.Value)
                         {
                             Filter1.Enqueue(ae);
                         }

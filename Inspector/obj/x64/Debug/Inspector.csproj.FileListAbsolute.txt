@@ -38,3 +38,23 @@ C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Reco
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Recorder.baml
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\InputBox.g.cs
 C:\Users\Chaemin Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\InputBox.baml
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\bin\x64\Debug\Inspector.exe.config
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\bin\x64\Debug\Inspector.exe
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\bin\x64\Debug\Inspector.pdb
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.csprojAssemblyReference.cache
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\InputBox.g.cs
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Loading.g.cs
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\MainWindow.g.cs
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Recorder.g.cs
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\App.g.cs
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector_MarkupCompile.cache
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector_MarkupCompile.lref
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\InputBox.baml
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Loading.baml
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\MainWindow.baml
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Recorder.baml
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.g.resources
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.Properties.Resources.resources
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.csproj.GenerateResource.cache
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.exe
+C:\Users\Chae Min Lim\Documents\GitHub\Inspector_git\Inspector\obj\x64\Debug\Inspector.pdb
