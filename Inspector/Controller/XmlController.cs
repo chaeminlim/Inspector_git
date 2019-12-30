@@ -56,7 +56,8 @@ namespace Inspector
                 xmlElement = tree.CreateElement("Element");
                 xmlElement.SetAttribute("Name", ae.Current.Name);
                 xmlElement.SetAttribute("Class", ae.Current.ClassName);
-
+                xmlElement.SetAttribute("ControlType", ae.Current.ControlType.ProgrammaticName);
+                xmlElement.SetAttribute("AutomationId", ae.Current.AutomationId);
                 root.AppendChild(xmlElement);
             }
 
@@ -415,6 +416,8 @@ namespace Inspector
         {
             Queue<AutomationElement> Filter1 = new Queue<AutomationElement>();
             Queue<AutomationElement> Filter2 = new Queue<AutomationElement>();
+            Queue<AutomationElement> Filter3 = new Queue<AutomationElement>();
+            Queue<AutomationElement> Filter4 = new Queue<AutomationElement>();
 
             foreach (XmlAttribute attribute in elemNode.Attributes)
             {
@@ -441,9 +444,32 @@ namespace Inspector
                         }
                     }
                 }
+                else if (attribute.Name == "ControlType")
+                {
+                    while (Filter2.Count > 0)
+                    {
+                        AutomationElement ae = Filter2.Dequeue();
+                        if (ae.Current.ControlType.ProgrammaticName == attribute.Value)
+                        {
+                            Filter3.Enqueue(ae);
+                        }
+                    }
+                }
+                else if (attribute.Name == "AutomationId")
+                {
+                    while (Filter3.Count > 0)
+                    {
+                        AutomationElement ae = Filter3.Dequeue();
+                        if (ae.Current.AutomationId == attribute.Value)
+                        {
+                            Filter4.Enqueue(ae);
+                        }
+                    }
+                }
+
             }
 
-            return FindChild(Filter2, depth);
+            return FindChild(Filter4, depth);
         }   
     }
 }

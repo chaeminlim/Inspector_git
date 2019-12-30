@@ -54,7 +54,8 @@ namespace Inspector
         {
             string[] lines = recorderController.ElementQueue.ToArray();
 
-            using (StreamWriter outputFile = new StreamWriter(@"C:\Users\Chaemin Lim\Documents\New_Xml_File.xml"))
+
+            using (StreamWriter outputFile = new StreamWriter(@"C:\Users\Chae Min Lim\Documents\New_Xml_File.xml"))
             {
                 foreach (string line in lines)
                 {
